@@ -1,7 +1,7 @@
 """
 参数描述类，以兼容多种参数输入形式
 """
-from typing import Type
+from typing import Type, Any
 
 
 class ArgumentDescription:
@@ -33,6 +33,7 @@ class ArgumentDescription:
         :param upper_open_bound: 上界（开区间），只能用于数值类型，会被legal_value_list设置覆盖（可选）
         :param upper_closed_bound: 上界（闭区间），只能用于数值类型，会被legal_value_list设置覆盖（可选）
         """
+        # 检查参数类型合法性
         assert type_ in self.__type_set
         if default_value:
             assert isinstance(default_value, type_)
@@ -53,6 +54,8 @@ class ArgumentDescription:
             assert self.__is_number_type(upper_open_bound)
         if upper_closed_bound:
             assert self.__is_number_type(upper_closed_bound)
+
+        # 初始化
         self.name = name
         self.type = type_
         self.help_info = help_info
@@ -63,3 +66,21 @@ class ArgumentDescription:
         self.lower_closed_bound = lower_closed_bound
         self.upper_open_bound = upper_open_bound
         self.upper_closed_bound = upper_closed_bound
+
+        # 检查默认值数值合法性
+        if default_value:
+            self.check_value(default_value)
+
+    def check_value(self, value: Any) -> None:
+        """检查参数是否符合描述，不符合直接退出"""
+        if self.legal_value_list:
+            assert value in self.legal_value_list
+        else:
+            if self.lower_open_bound:
+                assert self.lower_open_bound < value
+            if self.lower_closed_bound:
+                assert self.lower_closed_bound <= value
+            if self.upper_open_bound:
+                assert value < self.upper_open_bound
+            if self.upper_closed_bound:
+                assert value <= self.upper_closed_bound
