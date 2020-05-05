@@ -81,8 +81,6 @@ ITEM_FEATURES = "item_features"
 
 FEATURE_NAME = "feature_name"
 FEATURE_TYPE = "feature_type"
-MIN_VALUE = "min_value"
-MAX_VALUE = "max_value"
 
 # 特征列类型
 NUMERIC_COLUMN = "numeric"
