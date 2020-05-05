@@ -22,9 +22,9 @@ class NumericColumn:
             -> FloatTensor:
         """获取特征数据"""
         if normalization_mode == NormalizationMode.NOP:
-            return batch[self.feature_name]
+            return batch[self.feature_name].float()
         if normalization_mode == NormalizationMode.MAX_MIN:
-            return (batch[self.feature_name] - self.min_value) / (self.max_value - self.min_value)
+            return (batch[self.feature_name].float() - self.min_value) / (self.max_value - self.min_value)
         if normalization_mode == NormalizationMode.Z_SCORE:
-            return (batch[self.feature_name] - self.mean_value) / self.std_value
+            return (batch[self.feature_name].float() - self.mean_value) / self.std_value
         raise Exception("NormalizationMode is wrong!")
