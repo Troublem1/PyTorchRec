@@ -5,6 +5,7 @@ from typing import Dict, Any
 
 from torch import FloatTensor
 
+from torchrec.utils.const import *
 from .normalization_mode import NormalizationMode
 
 
@@ -28,3 +29,15 @@ class NumericColumn:
         if normalization_mode == NormalizationMode.Z_SCORE:
             return (batch[self.feature_name].float() - self.mean_value) / self.std_value
         raise Exception("NormalizationMode is wrong!")
+
+    @staticmethod
+    def from_description_dict(description: Dict):
+        """从词典中构造"""
+        assert description[FEATURE_TYPE] == NUMERIC_COLUMN
+        return NumericColumn(
+            feature_name=description[FEATURE_NAME],
+            min_value=description[MIN],
+            max_value=description[MAX],
+            mean_value=description[MEAN],
+            std_value=description[STD]
+        )
