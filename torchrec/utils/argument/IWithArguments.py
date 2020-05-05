@@ -14,6 +14,7 @@ class IWithArguments(ABC):
     @abstractmethod
     def get_argument_descriptions(cls) -> List[ArgumentDescription]:
         """获取参数描述信息"""
+        return list()
 
     @classmethod
     @abstractmethod
