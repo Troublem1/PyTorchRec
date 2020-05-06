@@ -25,7 +25,8 @@ USER_CSV = 'user.csv'  # 用户ID、用户特征（可选）信息
 USER_PKL = 'user.pkl'  # 用户ID、用户特征（可选）信息
 ITEM_CSV = 'item.csv'  # 物品ID、物品特征（可选）信息
 ITEM_PKL = 'item.pkl'  # 物品ID、物品特征（可选）信息
-DESCRIPTION_JSON = "description.json"  # 数据集统计信息
+DESCRIPTION_TXT = "description.txt"  # 数据集统计信息
+DESCRIPTION_PKL = "description.pkl"  # 数据集统计信息
 
 STATISTIC_DIR = "STATISTIC"
 
