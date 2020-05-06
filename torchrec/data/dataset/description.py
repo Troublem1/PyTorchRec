@@ -55,39 +55,43 @@ class DatasetDescription:
             IID].count().astype(np.int32)
         self.interaction_info[NEGATIVE] = create_interaction_description(negative_user_interaction_count)
 
+    def __str__(self):
+        s = f"Info: {self.info}\n"
+        s += "\n"
+        s += f"UID Column: {self.uid_column}\n"
+        s += f"IID Column: {self.iid_column}\n"
+        s += f"Rate Column: {self.rate_column}\n"
+        s += f"Label Column: {self.label_column}\n"
+        s += f"Time Column: {self.time_column}\n"
+        s += "\n"
+        s += f"User Numeric Columns:\n"
+        for column in self.user_numeric_columns:
+            s += f"\t{column}\n"
+        s += f"User Categorical Column:\n"
+        for column in self.user_categorical_columns:
+            s += f"\t{column}\n"
+        s += "\n"
+        s += f"Item Numeric Columns:\n"
+        for column in self.item_numeric_columns:
+            s += f"\t{column}\n"
+        s += f"Item Categorical Column:\n"
+        for column in self.item_categorical_columns:
+            s += f"\t{column}\n"
+        s += "\n"
+        s += f"Context Numeric Columns:\n"
+        for column in self.context_numeric_columns:
+            s += f"\t{column}\n"
+        s += f"Context Categorical Column:\n"
+        for column in self.context_categorical_columns:
+            s += f"\t{column}\n"
+        s += "\n"
+        for key, d in self.interaction_info.items():
+            s += f"Interaction {key}:\n"
+            for dk, dv in d.items():
+                s += f"\t{dk}: {dv}\n"
+        return s
+
     def to_txt_file(self, filename: str):
         """输出到文件"""
         with open(filename, "w") as file:
-            file.write(f"Info: {self.info}\n\n")
-            file.write("\n")
-            file.write(f"UID Column: {self.uid_column}\n\n")
-            file.write(f"IID Column: {self.iid_column}\n\n")
-            file.write(f"Rate Column: {self.rate_column}\n\n")
-            file.write(f"Label Column: {self.label_column}\n\n")
-            file.write(f"Time Column: {self.time_column}\n\n")
-            file.write("\n")
-            file.write(f"User Numeric Columns:\n\n")
-            for column in self.user_numeric_columns:
-                file.write(f"\t{column}\n\n")
-            file.write(f"User Categorical Column:\n\n")
-            for column in self.user_categorical_columns:
-                file.write(f"\t{column}\n\n")
-            file.write("\n")
-            file.write(f"Item Numeric Columns:\n\n")
-            for column in self.item_numeric_columns:
-                file.write(f"\t{column}\n\n")
-            file.write(f"Item Categorical Column:\n\n")
-            for column in self.item_categorical_columns:
-                file.write(f"\t{column}\n\n")
-            file.write("\n")
-            file.write(f"Context Numeric Columns:\n\n")
-            for column in self.context_numeric_columns:
-                file.write(f"\t{column}\n\n")
-            file.write(f"Context Categorical Column:\n\n")
-            for column in self.context_categorical_columns:
-                file.write(f"\t{column}\n\n")
-            file.write("\n")
-            for key, d in self.interaction_info.items():
-                file.write(f"Interaction {key}:\n\n")
-                for dk, dv in d.items():
-                    file.write(f"\t{dk}: {dv}\n\n")
+            file.write(self.__str__())
