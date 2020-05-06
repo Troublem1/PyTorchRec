@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 from pandas import Series
 from pandas.api import types
-from torch import LongTensor
+from torch import Tensor
 
 from torchrec.utils.const import *
 from .categorical_column import CategoricalColumn
@@ -18,7 +18,7 @@ class CategoricalColumnWithIdentity(CategoricalColumn):
         super().__init__(category_num)
         self.feature_name = feature_name
 
-    def get_feature_data(self, batch: Dict[str, Any]) -> LongTensor:
+    def get_feature_data(self, batch: Dict[str, Any]) -> Tensor:
         """获取特征数据"""
         return batch[self.feature_name].long()
 
