@@ -56,3 +56,9 @@ def create_user_history_info(dataset_name: str) -> None:
         user_neg_his_set_dict = create_user_his_set_dict(interaction_df, NEGATIVE)
         with open(os.path.join(statistic_dir, USER_NEG_HIS_SET_DICT_PKL), 'wb') as user_neg_his_set_dict_pkl:
             pkl.dump(user_neg_his_set_dict, user_neg_his_set_dict_pkl, pkl.HIGHEST_PROTOCOL)
+
+
+def check_user_history_info(dataset_name: str) -> bool:
+    """检查是否存在以用户为单位的历史统计信息"""
+    statistic_dir = os.path.join(DATASET_DIR, dataset_name, STATISTIC_DIR)
+    return os.path.exists(os.path.join(statistic_dir, USER_POS_HIS_SET_DICT_PKL))

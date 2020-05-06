@@ -86,3 +86,17 @@ def create_history_info(dataset_name: str, k: int) -> None:
         np.save(os.path.join(history_dir, NEG_HIS_NPY_TEMPLATE % k), all_neg_array)
         # noinspection PyTypeChecker
         np.savetxt(os.path.join(history_dir, NEG_HIS_CSV_TEMPLATE % k), all_neg_array, delimiter=SEP, fmt='%d')
+
+
+def check_history_info(dataset_name: str) -> List[int]:
+    """检查每个已经生成过的历史信息的长度"""
+    import re
+    history_dir = os.path.join(DATASET_DIR, dataset_name, HISTORY_DIR)
+    pattern = re.compile(r"^pos_his_(\d+).npy$")
+    len_list = list()
+    for filename in os.listdir(history_dir):
+        match_result = pattern.match(filename)
+        if match_result:
+            len_list.append(int(match_result.group(1)))
+    len_list.sort()
+    return len_list

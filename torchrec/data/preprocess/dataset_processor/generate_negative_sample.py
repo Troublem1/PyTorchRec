@@ -82,3 +82,18 @@ def generate_negative_sample(seed: int, dataset_name: str, sample_n: int) -> Non
     # noinspection PyTypeChecker
     np.savetxt(os.path.join(negsam_dir, TEST_NEG_CSV_TEMPLATE % sample_n), test_neg_sample_iid_array,
                delimiter=SEP, fmt='%d')
+
+
+def check_negative_sample(dataset_name: str) -> List[int]:
+    """检查验证集与测试集负采样的采样长度列表"""
+    import re
+    sample_dir = os.path.join(DATASET_DIR, dataset_name, NEGATIVE_SAMPLE_DIR)
+    test_len_set, dev_len_set = set(), set()
+    for (type, len_set) in [("test", test_len_set), ("dev", dev_len_set)]:
+        pattern = re.compile(rf"^{type}_neg_(\d+).npy$")
+        for filename in os.listdir(sample_dir):
+            match_result = pattern.match(filename)
+            if match_result:
+                len_set.add(int(match_result.group(1)))
+    len_list = sorted(list(test_len_set & dev_len_set))
+    return len_list

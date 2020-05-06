@@ -2,7 +2,7 @@
 留下最后K个划分
 """
 import logging
-from typing import Set, List
+from typing import Set, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -90,3 +90,18 @@ def leave_k_out_split(dataset_name: str, warm_n: int, k: int):
         # noinspection PyTypeChecker
         np.savetxt(os.path.join(split_index_dir, csv_template % split_name),
                    array, delimiter=SEP, fmt='%d')
+
+
+def check_leave_k_out_split(dataset_name: str) -> List[Tuple[int, int]]:
+    """检查留下最后K个划分参数"""
+    import re
+    split_dir = os.path.join(DATASET_DIR, dataset_name, SPLIT_INDEX_DIR)
+    train_var_set, dev_var_set, test_var_set = set(), set(), set()
+    for (type, var_set) in [("train", train_var_set), ("dev", dev_var_set), ("test", test_var_set)]:
+        pattern = re.compile(rf"^leave_k_out_(\d+)_(\d+).{type}_index.npy$")
+        for filename in os.listdir(split_dir):
+            match_result = pattern.match(filename)
+            if match_result:
+                var_set.add((int(match_result.group(1)), int(match_result.group(2))))
+    var_list = sorted(list(train_var_set & dev_var_set & test_var_set))
+    return var_list
