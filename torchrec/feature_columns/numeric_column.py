@@ -44,3 +44,10 @@ class NumericColumn(DenseColumn):
             mean_value=series.mean(),
             std_value=series.std()
         )
+
+    def __str__(self):
+        s = f"name: {self.feature_name}, min: {self.min_value}, max: {self.max_value}, mean: {self.mean_value}" \
+            f", std: {self.std_value}"
+        for key, value in self.get_info().items():
+            s += f", {key}: {value}"
+        return s

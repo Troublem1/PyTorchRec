@@ -35,3 +35,9 @@ class CategoricalColumnWithIdentity(CategoricalColumn):
         for key, value in other_info.items():
             column.set_info(key, value)
         return column
+
+    def __str__(self):
+        s = f"name: {self.feature_name}, category_num: {self.category_num}"
+        for key, value in self.get_info().items():
+            s += f", {key}: {value}"
+        return s

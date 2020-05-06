@@ -17,7 +17,7 @@ class FeatureColumn(ABC):
         """设置额外信息"""
         self.__info[key] = value
 
-    def get_info(self) -> Any:
+    def get_info(self) -> Dict:
         """获取额外信息"""
         return self.__info
 
