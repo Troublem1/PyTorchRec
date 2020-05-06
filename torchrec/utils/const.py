@@ -42,8 +42,8 @@ NEG_HIS_NPY_TEMPLATE = 'neg_his_%d.npy'  # 负向交互历史信息
 
 NEGATIVE_SAMPLE_DIR = "NEGATIVE_SAMPLE"
 
-VALIDATION_NEG_CSV_TEMPLATE = 'validation_neg_%d.csv'  # 验证集负采样文件
-VALIDATION_NEG_NPY_TEMPLATE = 'validation_neg_%d.npy'  # 验证集负采样文件
+DEV_NEG_CSV_TEMPLATE = 'dev_neg_%d.csv'  # 验证集负采样文件
+DEV_NEG_NPY_TEMPLATE = 'dev_neg_%d.npy'  # 验证集负采样文件
 TEST_NEG_CSV_TEMPLATE = 'test_neg_%d.csv'  # 测试集负采样文件
 TEST_NEG_NPY_TEMPLATE = 'test_neg_%d.npy'  # 测试集负采样文件
 

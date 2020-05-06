@@ -72,9 +72,9 @@ def generate_negative_sample(seed: int, dataset_name: str, sample_n: int) -> Non
     check_dir_and_mkdir(negsam_dir)
 
     assert validation_neg_sample_iid_array.dtype == np.int32, validation_neg_sample_iid_array.dtype
-    np.save(os.path.join(negsam_dir, VALIDATION_NEG_NPY_TEMPLATE % sample_n), validation_neg_sample_iid_array)
+    np.save(os.path.join(negsam_dir, DEV_NEG_NPY_TEMPLATE % sample_n), validation_neg_sample_iid_array)
     # noinspection PyTypeChecker
-    np.savetxt(os.path.join(negsam_dir, VALIDATION_NEG_CSV_TEMPLATE % sample_n), validation_neg_sample_iid_array,
+    np.savetxt(os.path.join(negsam_dir, DEV_NEG_CSV_TEMPLATE % sample_n), validation_neg_sample_iid_array,
                delimiter=SEP, fmt='%d')
 
     assert test_neg_sample_iid_array.dtype == np.int32, test_neg_sample_iid_array.dtype
