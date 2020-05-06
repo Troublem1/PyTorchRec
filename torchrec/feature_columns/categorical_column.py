@@ -1,29 +1,14 @@
 """
-分类特征类
+离散分类特征列，只能输入线性网络，输入深度网络需要通过Embedding等操作，除非模型有隐式转换
 """
-from typing import Dict, Any
+from abc import ABC
 
-from torch import LongTensor
-
-from torchrec.utils.const import *
+from .feature_column import FeatureColumn
 
 
-class CategoricalColumn:
-    """分类特征类，输入必须是整数，需要提前处理成密集分类，等价于生成[0-max]的one-hot向量"""
+class CategoricalColumn(FeatureColumn, ABC):
+    """离散分类特征类"""
 
-    def __init__(self, feature_name: str, max_value: int):
-        self.feature_name = feature_name
-        self.category_num = max_value + 1
-
-    def get_feature_data(self, batch: Dict[str, Any]) -> LongTensor:
-        """获取特征数据"""
-        return batch[self.feature_name].long()
-
-    @staticmethod
-    def from_description_dict(description: Dict):
-        """从词典中构造"""
-        assert description[FEATURE_TYPE] == CATEGORICAL_COLUMN
-        return CategoricalColumn(
-            feature_name=description[FEATURE_NAME],
-            max_value=description[MAX]
-        )
+    def __init__(self, category_num: int):
+        super().__init__()
+        self.category_num = category_num
