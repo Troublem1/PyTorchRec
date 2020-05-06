@@ -3,16 +3,19 @@
 """
 from typing import Dict, Any
 
+from pandas import Series
+from pandas.api import types
 from torch import FloatTensor
 
-from torchrec.utils.const import *
+from .dense_column import DenseColumn
 from .normalization_mode import NormalizationMode
 
 
-class NumericColumn:
+class NumericColumn(DenseColumn):
     """数值特征列"""
 
     def __init__(self, feature_name: str, min_value: float, max_value: float, mean_value: float, std_value: float):
+        super().__init__()
         self.feature_name = feature_name
         self.min_value = min_value
         self.max_value = max_value
@@ -31,13 +34,13 @@ class NumericColumn:
         raise Exception("NormalizationMode is wrong!")
 
     @staticmethod
-    def from_description_dict(description: Dict):
-        """从词典中构造"""
-        assert description[FEATURE_TYPE] == NUMERIC_COLUMN
+    def from_series(feature_name: str, series: Series):
+        """从pandas.Series中构造"""
+        assert types.is_numeric_dtype(series), series.dtypes
         return NumericColumn(
-            feature_name=description[FEATURE_NAME],
-            min_value=description[MIN],
-            max_value=description[MAX],
-            mean_value=description[MEAN],
-            std_value=description[STD]
+            feature_name=feature_name,
+            min_value=series.min(),
+            max_value=series.max(),
+            mean_value=series.mean(),
+            std_value=series.std()
         )
