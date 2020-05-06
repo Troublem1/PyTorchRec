@@ -31,17 +31,17 @@ class IDataReader(IWithArguments):
         """获取训练集数据"""
 
     @abstractmethod
-    def get_validation_dataset_size(self) -> int:
-        """获取训练集大小"""
+    def get_dev_dataset_size(self) -> int:
+        """获取验证集大小"""
 
     @staticmethod
-    def get_validation_dataset_item(self, index: int) -> Dict[str, Any]:
-        """获取训练集数据"""
+    def get_dev_dataset_item(self, index: int) -> Dict[str, Any]:
+        """获取验证集数据"""
 
     @staticmethod
     def get_test_dataset_size(self) -> int:
-        """获取训练集大小"""
+        """获取测试集大小"""
 
     @staticmethod
     def get_test_dataset_item(self, index: int) -> Dict[str, Any]:
-        """获取训练集数据"""
+        """获取测试集数据"""
