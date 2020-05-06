@@ -29,7 +29,7 @@ def pad_or_cut_array(array: ndarray, array_len: int, pad: int = 0) -> ndarray:
     return array
 
 
-def create_last_k_history(dataset_name: str, k: int) -> None:
+def create_history_info(dataset_name: str, k: int) -> None:
     """
     生成每条交互记录前k个历史信息，直接输出ndarray矩阵，形状为(DF_LEN, k + 1)，按照数据集顺序排序，第一列是历史信息长度，后面是历史信息
     :param dataset_name: 数据集名称

@@ -10,7 +10,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from torchrec.data.dataset import DatasetDescription
-from torchrec.data.preprocess.dataset_processor import create_user_history_info, create_last_k_history, \
+from torchrec.data.preprocess.dataset_processor import create_user_history_info, create_history_info, \
     generate_negative_sample, sequential_split, leave_k_out_split
 from torchrec.data.preprocess.feature_processor import get_int_map, get_bucketize_fn
 from torchrec.feature_columns import CategoricalColumnWithIdentity
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     )
     create_user_history_info(dataset_name=dataset_name)
     for i in range(1, 11):
-        create_last_k_history(dataset_name=dataset_name, k=i)
+        create_history_info(dataset_name=dataset_name, k=i)
     generate_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
     sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
     leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     )
     create_user_history_info(dataset_name=dataset_name)
     for i in range(1, 11):
-        create_last_k_history(dataset_name=dataset_name, k=i)
+        create_history_info(dataset_name=dataset_name, k=i)
     generate_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
     sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
     leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
