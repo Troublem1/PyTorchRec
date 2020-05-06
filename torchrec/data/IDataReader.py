@@ -3,7 +3,7 @@
 可以通过Dataset类与DataLoader类以批量形式提供数据
 """
 import pickle as pkl
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import Dict, Any
 
 from torchrec.utils.argument import IWithArguments
@@ -11,7 +11,7 @@ from torchrec.utils.const import *
 from .dataset import DatasetDescription
 
 
-class IDataReader(IWithArguments):
+class IDataReader(IWithArguments, ABC):
     """数据读入接口类"""
 
     @staticmethod
@@ -34,14 +34,14 @@ class IDataReader(IWithArguments):
     def get_dev_dataset_size(self) -> int:
         """获取验证集大小"""
 
-    @staticmethod
+    @abstractmethod
     def get_dev_dataset_item(self, index: int) -> Dict[str, Any]:
         """获取验证集数据"""
 
-    @staticmethod
+    @abstractmethod
     def get_test_dataset_size(self) -> int:
         """获取测试集大小"""
 
-    @staticmethod
+    @abstractmethod
     def get_test_dataset_item(self, index: int) -> Dict[str, Any]:
         """获取测试集数据"""
