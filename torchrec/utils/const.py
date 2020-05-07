@@ -64,6 +64,7 @@ SEP = '\t'
 SEQ_SEP = ","
 
 # 数据列字符串常量
+INDEX = "index"
 UID = 'uid'
 IID = 'iid'
 RATE = "rate"
