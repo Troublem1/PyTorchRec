@@ -19,7 +19,6 @@ class IDataReader(IWithArguments, ABC):
         """获取数据集信息供其他模块使用"""
         with open(os.path.join(DATASET_DIR, dataset_name, DESCRIPTION_PKL), "rb") as dataset_description_pkl:
             dataset_description = pkl.load(dataset_description_pkl)
-        print(dataset_description)
         return dataset_description
 
     @abstractmethod
