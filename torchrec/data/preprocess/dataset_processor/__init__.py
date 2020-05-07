@@ -1,6 +1,7 @@
 """
 数据集处理函数
 """
+from .check_dataset import check_dataset
 from .create_history_info import create_history_info, check_history_info
 from .create_user_history_info import create_user_history_info, check_user_history_info
 from .generate_negative_sample import generate_negative_sample, check_negative_sample
