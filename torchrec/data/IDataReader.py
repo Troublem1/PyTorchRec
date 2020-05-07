@@ -15,10 +15,14 @@ class IDataReader(IWithArguments, ABC):
     """数据读入接口类"""
 
     @staticmethod
-    def get_dataset_description(dataset_name) -> DatasetDescription:
+    def get_dataset_description(dataset_name: str, append_id: bool) -> DatasetDescription:
         """获取数据集信息供其他模块使用"""
         with open(os.path.join(DATASET_DIR, dataset_name, DESCRIPTION_PKL), "rb") as dataset_description_pkl:
-            dataset_description = pkl.load(dataset_description_pkl)
+            dataset_description: DatasetDescription = pkl.load(dataset_description_pkl)
+        if append_id:
+            assert dataset_description.uid_column is not None and dataset_description.iid_column is not None
+            dataset_description.user_categorical_columns.insert(0, dataset_description.uid_column)
+            dataset_description.item_categorical_columns.insert(0, dataset_description.iid_column)
         return dataset_description
 
     @abstractmethod
