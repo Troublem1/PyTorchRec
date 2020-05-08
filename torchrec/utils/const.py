@@ -15,16 +15,12 @@ else:
 
 # 数据路径常量
 RAW_DATA_DIR = os.path.join(WORK_DIR, 'RawData')  # 原始数据目录
-DATASET_DIR = os.path.join(WORK_DIR, 'Dataset')  # 过滤并格式化数据目录(通常包含interaction.csv, user.csv, item.csv)
+DATASET_DIR = os.path.join(WORK_DIR, 'Dataset')  # 过滤并格式化数据目录(通常包含base_interaction.csv, interaction.csv)
 
 BASE_INTERACTION_CSV = 'base_interaction.csv'  # 用户ID、物品ID、评分、标签、时间戳信息
-BASE_INTERACTION_PKL = 'base_interaction.pkl'  # 用户ID、物品ID、评分、标签、时间戳信息
-INTERACTION_CSV = 'interaction.csv'  # 用户ID、物品ID、评分、标签、时间戳、上下文特征（可选）信息
-INTERACTION_PKL = 'interaction.pkl'  # 用户ID、物品ID、评分、标签、时间戳、上下文特征（可选）信息
-USER_CSV = 'user.csv'  # 用户ID、用户特征（可选）信息
-USER_PKL = 'user.pkl'  # 用户ID、用户特征（可选）信息
-ITEM_CSV = 'item.csv'  # 物品ID、物品特征（可选）信息
-ITEM_PKL = 'item.pkl'  # 物品ID、物品特征（可选）信息
+BASE_INTERACTION_FEATHER = 'base_interaction.feather'  # 用户ID、物品ID、评分、标签、时间戳信息
+INTERACTION_CSV = 'interaction.csv'  # 用户ID、物品ID、评分、标签、时间戳、上下文/用户/物品特征（可选）信息
+INTERACTION_FEATHER = 'interaction.feather'  # 用户ID、物品ID、评分、标签、时间戳、上下文/用户/物品特征（可选）信息
 DESCRIPTION_TXT = "description.txt"  # 数据集统计信息
 DESCRIPTION_PKL = "description.pkl"  # 数据集统计信息
 
