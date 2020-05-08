@@ -1,7 +1,7 @@
 """
 数据集描述类
 """
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 import numpy as np
 from pandas import DataFrame, Series
@@ -22,12 +22,9 @@ class DatasetDescription:
         self.label_column: Optional[CategoricalColumnWithIdentity] = None
         self.time_column: Optional[CategoricalColumnWithIdentity] = None
 
-        self.user_numeric_columns: List[NumericColumn] = list()
-        self.user_categorical_columns: List[CategoricalColumnWithIdentity] = list()
-        self.item_numeric_columns: List[NumericColumn] = list()
-        self.item_categorical_columns: List[CategoricalColumnWithIdentity] = list()
-        self.context_numeric_columns: List[NumericColumn] = list()
-        self.context_categorical_columns: List[CategoricalColumnWithIdentity] = list()
+        self.user_columns: List[Union[CategoricalColumnWithIdentity, NumericColumn]] = list()
+        self.item_columns: List[Union[CategoricalColumnWithIdentity, NumericColumn]] = list()
+        self.context_columns: List[Union[CategoricalColumnWithIdentity, NumericColumn]] = list()
 
         self.interaction_info: Dict = dict()
 
@@ -64,25 +61,16 @@ class DatasetDescription:
         s += f"Label Column: {self.label_column}\n"
         s += f"Time Column: {self.time_column}\n"
         s += "\n"
-        s += f"User Numeric Columns:\n"
-        for column in self.user_numeric_columns:
-            s += f"\t{column}\n"
-        s += f"User Categorical Column:\n"
-        for column in self.user_categorical_columns:
+        s += f"Context Columns:\n"
+        for column in self.context_columns:
             s += f"\t{column}\n"
         s += "\n"
-        s += f"Item Numeric Columns:\n"
-        for column in self.item_numeric_columns:
-            s += f"\t{column}\n"
-        s += f"Item Categorical Column:\n"
-        for column in self.item_categorical_columns:
+        s += f"User Columns:\n"
+        for column in self.user_columns:
             s += f"\t{column}\n"
         s += "\n"
-        s += f"Context Numeric Columns:\n"
-        for column in self.context_numeric_columns:
-            s += f"\t{column}\n"
-        s += f"Context Categorical Column:\n"
-        for column in self.context_categorical_columns:
+        s += f"Item Columns:\n"
+        for column in self.item_columns:
             s += f"\t{column}\n"
         s += "\n"
         for key, d in self.interaction_info.items():
