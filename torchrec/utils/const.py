@@ -24,6 +24,18 @@ INTERACTION_FEATHER = 'interaction.feather'  # 用户ID、物品ID、评分、�
 DESCRIPTION_TXT = "description.txt"  # 数据集统计信息
 DESCRIPTION_PKL = "description.pkl"  # 数据集统计信息
 
+SPLIT_INDEX_DIR = "SPLIT_INDEX"
+
+SEQUENTIAL_SPLIT_NAME_TEMPLATE = "seq_split_%d_%.2f"  # %d：暖用户要求，%.2f：验证/测试集比例
+LEAVE_K_OUT_SPLIT_NAME_TEMPLATE = "leave_k_out_%d_%d"  # %d：暖用户要求，%d：留出个数
+
+TRAIN_INDEX_CSV_TEMPLATE = "%s.train_index.csv"  # 训练集对应的interaction_df的index，%s：划分名称
+TRAIN_INDEX_NPY_TEMPLATE = "%s.train_index.npy"  # 训练集对应的interaction_df的index，%s：划分名称
+DEV_INDEX_CSV_TEMPLATE = "%s.dev_index.csv"  # 验证集集对应的interaction_df的index，%s：划分名称
+DEV_INDEX_NPY_TEMPLATE = "%s.dev_index.npy"  # 验证集集对应的interaction_df的index，%s：划分名称
+TEST_INDEX_CSV_TEMPLATE = "%s.test_index.csv"  # 测试集对应的interaction_df的index，%s：划分名称
+TEST_INDEX_NPY_TEMPLATE = "%s.test_index.npy"  # 测试集对应的interaction_df的index，%s：划分名称
+
 STATISTIC_DIR = "STATISTIC"
 
 USER_POS_HIS_SET_DICT_PKL = 'user_pos_his_set_dict.pkl'  # 正向交互信息构成集合按 uid 合并文件
@@ -42,18 +54,6 @@ DEV_NEG_CSV_TEMPLATE = 'dev_neg_%d.csv'  # 验证集负采样文件
 DEV_NEG_NPY_TEMPLATE = 'dev_neg_%d.npy'  # 验证集负采样文件
 TEST_NEG_CSV_TEMPLATE = 'test_neg_%d.csv'  # 测试集负采样文件
 TEST_NEG_NPY_TEMPLATE = 'test_neg_%d.npy'  # 测试集负采样文件
-
-SPLIT_INDEX_DIR = "SPLIT_INDEX"
-
-SEQUENTIAL_SPLIT_NAME_TEMPLATE = "seq_split_%d_%.2f"  # %d：暖用户要求，%.2f：验证/测试集比例
-LEAVE_K_OUT_SPLIT_NAME_TEMPLATE = "leave_k_out_%d_%d"  # %d：暖用户要求，%d：留出个数
-
-TRAIN_INDEX_CSV_TEMPLATE = "%s.train_index.csv"  # 训练集对应的interaction_df的index，%s：划分名称
-TRAIN_INDEX_NPY_TEMPLATE = "%s.train_index.npy"  # 训练集对应的interaction_df的index，%s：划分名称
-DEV_INDEX_CSV_TEMPLATE = "%s.dev_index.csv"  # 验证集集对应的interaction_df的index，%s：划分名称
-DEV_INDEX_NPY_TEMPLATE = "%s.dev_index.npy"  # 验证集集对应的interaction_df的index，%s：划分名称
-TEST_INDEX_CSV_TEMPLATE = "%s.test_index.csv"  # 测试集对应的interaction_df的index，%s：划分名称
-TEST_INDEX_NPY_TEMPLATE = "%s.test_index.npy"  # 测试集对应的interaction_df的index，%s：划分名称
 
 # 数据格式相关常量
 SEP = '\t'

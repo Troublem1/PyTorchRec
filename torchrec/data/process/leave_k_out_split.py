@@ -27,10 +27,10 @@ def generate_leave_k_out_split(dataset_name: str, warm_n: int, k: int):
     split_name = LEAVE_K_OUT_SPLIT_NAME_TEMPLATE % (warm_n, k)
     check_dir_and_mkdir(split_index_dir)
 
-    interaction_pkl = os.path.join(dataset_dir, BASE_INTERACTION_PKL)
+    interaction_feather = os.path.join(dataset_dir, BASE_INTERACTION_FEATHER)
 
     logging.info('读取数据集交互数据...')
-    interaction_df: DataFrame = pd.read_pickle(interaction_pkl)
+    interaction_df: DataFrame = pd.read_feather(interaction_feather)
     logging.info(f'交互总数：{len(interaction_df)}')
     logging.info(f'用户总数：{len(interaction_df[UID].unique())}')
     if warm_n == 0:
