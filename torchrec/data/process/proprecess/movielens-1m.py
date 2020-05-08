@@ -180,6 +180,10 @@ def format_data(dataset_name: str, rank_to_label: Dict, info: str) -> None:
     base_interaction_df.to_feather(os.path.join(dataset_dir, BASE_INTERACTION_FEATHER))
     merge_interaction_df.to_csv(os.path.join(dataset_dir, INTERACTION_CSV), index=False, sep=SEP)
     merge_interaction_df.to_feather(os.path.join(dataset_dir, INTERACTION_FEATHER))
+    item_df.to_csv(os.path.join(dataset_dir, ITEM_CSV), index=False, sep=SEP)
+    item_df.to_feather(os.path.join(dataset_dir, ITEM_FEATHER))
+    user_df.to_csv(os.path.join(dataset_dir, USER_CSV), index=False, sep=SEP)
+    user_df.to_feather(os.path.join(dataset_dir, USER_FEATHER))
 
     logging.info('保存数据集信息...')
     with open(os.path.join(dataset_dir, DESCRIPTION_PKL), "wb") as description_pkl:

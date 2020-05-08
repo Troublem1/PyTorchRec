@@ -21,6 +21,10 @@ BASE_INTERACTION_CSV = 'base_interaction.csv'  # 用户ID、物品ID、评分、
 BASE_INTERACTION_FEATHER = 'base_interaction.feather'  # 用户ID、物品ID、评分、标签、时间戳信息
 INTERACTION_CSV = 'interaction.csv'  # 用户ID、物品ID、评分、标签、时间戳、上下文/用户/物品特征（可选）信息
 INTERACTION_FEATHER = 'interaction.feather'  # 用户ID、物品ID、评分、标签、时间戳、上下文/用户/物品特征（可选）信息
+ITEM_CSV = 'item.csv'  # 物品ID、物品特征（可选）信息
+ITEM_FEATHER = 'item.feather'  # 物品ID、物品特征（可选）信息
+USER_CSV = 'user.csv'  # 用户ID、用户特征（可选）信息
+USER_FEATHER = 'user.feather'  # 用户ID、用户特征（可选）信息
 DESCRIPTION_TXT = "description.txt"  # 数据集统计信息
 DESCRIPTION_PKL = "description.pkl"  # 数据集统计信息
 
