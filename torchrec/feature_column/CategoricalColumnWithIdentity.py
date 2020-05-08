@@ -7,7 +7,7 @@ from pandas import Series
 from pandas.api import types
 from torch import Tensor
 
-from torchrec.feature_column.categorical_column import CategoricalColumn
+from torchrec.feature_column.CategoricalColumn import CategoricalColumn
 from torchrec.utils.const import *
 
 
