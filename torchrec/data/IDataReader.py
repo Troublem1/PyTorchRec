@@ -21,8 +21,8 @@ class IDataReader(IWithArguments, ABC):
             dataset_description: DatasetDescription = pkl.load(dataset_description_pkl)
         if append_id:
             assert dataset_description.uid_column is not None and dataset_description.iid_column is not None
-            dataset_description.user_categorical_columns.insert(0, dataset_description.uid_column)
-            dataset_description.item_categorical_columns.insert(0, dataset_description.iid_column)
+            dataset_description.user_columns.insert(0, dataset_description.uid_column)
+            dataset_description.item_columns.insert(0, dataset_description.iid_column)
         return dataset_description
 
     @abstractmethod
