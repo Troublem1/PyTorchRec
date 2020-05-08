@@ -6,11 +6,11 @@ import logging
 import os
 
 
-def init_console_logger() -> None:
+def init_console_logger(level=logging.INFO) -> None:
     """
     初始化终端日志打印
     """
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(filename)s %(funcName)s :: %(message)s')
+    logging.basicConfig(level=level, format='%(asctime)s %(filename)s %(funcName)s :: %(message)s')
 
 
 def check_dir_and_mkdir(path: str) -> None:
