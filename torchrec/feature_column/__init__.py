@@ -1,0 +1,10 @@
+"""
+特征列模块
+"""
+from torchrec.feature_column.categorical_column import CategoricalColumn
+from torchrec.feature_column.categorical_column_with_identity import CategoricalColumnWithIdentity
+from torchrec.feature_column.crossed_column import CrossedColumn
+from torchrec.feature_column.dense_column import DenseColumn
+from torchrec.feature_column.feature_column import FeatureColumn
+from torchrec.feature_column.normalization_mode import NormalizationMode
+from torchrec.feature_column.numeric_column import NumericColumn

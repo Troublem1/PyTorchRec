@@ -6,7 +6,7 @@ from typing import Optional, List, Dict
 import numpy as np
 from pandas import DataFrame, Series
 
-from torchrec.feature_columns import CategoricalColumnWithIdentity, NumericColumn
+from torchrec.feature_column import CategoricalColumnWithIdentity, NumericColumn
 from torchrec.utils.const import *
 
 

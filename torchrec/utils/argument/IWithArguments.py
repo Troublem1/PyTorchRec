@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
-from .description import ArgumentDescription
+from torchrec.utils.argument.description import ArgumentDescription
 
 
 class IWithArguments(ABC):

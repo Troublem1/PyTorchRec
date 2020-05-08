@@ -3,7 +3,7 @@
 """
 from abc import ABC
 
-from .feature_column import FeatureColumn
+from torchrec.feature_column.feature_column import FeatureColumn
 
 
 class CategoricalColumn(FeatureColumn, ABC):

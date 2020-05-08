@@ -29,7 +29,7 @@ def pad_or_cut_array(array: ndarray, array_len: int, pad: int = 0) -> ndarray:
     return array
 
 
-def create_history_info(dataset_name: str, k: int) -> None:
+def generate_interaction_history_list(dataset_name: str, k: int) -> None:
     """
     生成每条交互记录前k个历史信息，直接输出ndarray矩阵，形状为(DF_LEN, k + 1)，按照数据集顺序排序，第一列是历史信息长度，后面是历史信息
     :param dataset_name: 数据集名称
@@ -88,7 +88,7 @@ def create_history_info(dataset_name: str, k: int) -> None:
         np.savetxt(os.path.join(history_dir, NEG_HIS_CSV_TEMPLATE % k), all_neg_array, delimiter=SEP, fmt='%d')
 
 
-def check_history_info(dataset_name: str) -> List[int]:
+def check_interaction_history_list(dataset_name: str) -> List[int]:
     """检查每个已经生成过的历史信息的长度"""
     import re
     history_dir = os.path.join(DATASET_DIR, dataset_name, HISTORY_DIR)

@@ -5,7 +5,7 @@ from typing import Dict, Any, List
 
 from torch import Tensor
 
-from .categorical_column import CategoricalColumn
+from torchrec.feature_column.categorical_column import CategoricalColumn
 
 
 class CrossedColumn(CategoricalColumn):

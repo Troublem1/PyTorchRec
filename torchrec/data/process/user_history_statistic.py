@@ -13,7 +13,7 @@ from torchrec.utils.const import *
 from torchrec.utils.system import check_dir_and_mkdir
 
 
-def create_user_history_info(dataset_name: str) -> None:
+def generate_user_history_statistic(dataset_name: str) -> None:
     """
     生成以用户为单位的历史统计信息
     :param dataset_name: 数据集名称
@@ -58,7 +58,7 @@ def create_user_history_info(dataset_name: str) -> None:
             pkl.dump(user_neg_his_set_dict, user_neg_his_set_dict_pkl, pkl.HIGHEST_PROTOCOL)
 
 
-def check_user_history_info(dataset_name: str) -> bool:
+def check_user_history_statistic(dataset_name: str) -> bool:
     """检查是否存在以用户为单位的历史统计信息"""
     statistic_dir = os.path.join(DATASET_DIR, dataset_name, STATISTIC_DIR)
     return os.path.exists(os.path.join(statistic_dir, USER_POS_HIS_SET_DICT_PKL))

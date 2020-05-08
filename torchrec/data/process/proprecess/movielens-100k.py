@@ -10,10 +10,10 @@ import pandas as pd
 from pandas import DataFrame
 
 from torchrec.data.dataset import DatasetDescription
-from torchrec.data.preprocess.dataset_processor import create_user_history_info, create_history_info, \
-    generate_negative_sample, sequential_split, leave_k_out_split
-from torchrec.data.preprocess.feature_processor import get_int_map, get_bucketize_fn
-from torchrec.feature_columns import CategoricalColumnWithIdentity
+from torchrec.data.process import generate_user_history_statistic, generate_interaction_history_list, \
+    generate_vt_negative_sample, generate_sequential_split, generate_leave_k_out_split
+from torchrec.data.process.feature_process import get_int_map, get_bucketize_fn
+from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.utils.const import *
 from torchrec.utils.system import init_console_logger, check_dir_and_mkdir
 
@@ -168,12 +168,12 @@ if __name__ == '__main__':
         rank_to_label={1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
         info="正负例化的MovieLens-100K数据集，评分为4/5为正例，评分为1/2/3为负例"
     )
-    create_user_history_info(dataset_name=dataset_name)
+    generate_user_history_statistic(dataset_name=dataset_name)
     for i in range(1, 11):
-        create_history_info(dataset_name=dataset_name, k=i)
-    generate_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
-    sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
-    leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
+        generate_interaction_history_list(dataset_name=dataset_name, k=i)
+    generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
+    generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
+    generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
 
     dataset_name = RAW_DATA_NAME + "-P"
     format_data(
@@ -181,9 +181,9 @@ if __name__ == '__main__':
         rank_to_label={1: 1, 2: 1, 3: 1, 4: 1, 5: 1},
         info="全部视为正例的MovieLens-100K数据集，评分为1/2/3/4/5为正例"
     )
-    create_user_history_info(dataset_name=dataset_name)
+    generate_user_history_statistic(dataset_name=dataset_name)
     for i in range(1, 11):
-        create_history_info(dataset_name=dataset_name, k=i)
-    generate_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
-    sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
-    leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
+        generate_interaction_history_list(dataset_name=dataset_name, k=i)
+    generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
+    generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
+    generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)

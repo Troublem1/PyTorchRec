@@ -1,5 +1,5 @@
 """
 数据集相关模块
 """
-from .dataset_mode import DatasetMode
-from .description import DatasetDescription
+from torchrec.data.dataset.DatasetDescription import DatasetDescription
+from torchrec.data.dataset.SplitMode import SplitMode

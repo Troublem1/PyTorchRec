@@ -7,8 +7,8 @@ from pandas import Series
 from pandas.api import types
 from torch import FloatTensor
 
-from .dense_column import DenseColumn
-from .normalization_mode import NormalizationMode
+from torchrec.feature_column.dense_column import DenseColumn
+from torchrec.feature_column.normalization_mode import NormalizationMode
 
 
 class NumericColumn(DenseColumn):

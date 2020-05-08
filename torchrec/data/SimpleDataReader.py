@@ -15,10 +15,11 @@ from pandas import DataFrame
 from tqdm import tqdm
 
 from torchrec.data.IDataReader import IDataReader
-from torchrec.data.dataset import DatasetMode, DatasetDescription
-from torchrec.data.preprocess import check_dataset, check_sequential_split, sequential_split, check_leave_k_out_split, \
-    leave_k_out_split
-from torchrec.tasks import TrainMode
+from torchrec.data.dataset import SplitMode, DatasetDescription
+from torchrec.data.process import check_dataset_info
+from torchrec.data.process import check_leave_k_out_split, generate_leave_k_out_split
+from torchrec.data.process import check_sequential_split, generate_sequential_split
+from torchrec.task import TrainMode
 from torchrec.utils.argument import ArgumentDescription
 from torchrec.utils.const import *
 from torchrec.utils.enum import get_enum_values
@@ -59,10 +60,10 @@ class SimpleDataReader(IDataReader):
         argument_descriptions = super().get_argument_descriptions()
         argument_descriptions.extend([
             ArgumentDescription(name="dataset", type_=str, help_info="数据集名称",
-                                legal_value_list=check_dataset()),
+                                legal_value_list=check_dataset_info()),
             ArgumentDescription(name="dataset_mode", type_=str, help_info="数据集划分模式",
-                                default_value=DatasetMode.LEAVE_K_OUT.value,
-                                legal_value_list=get_enum_values(DatasetMode)),
+                                default_value=SplitMode.LEAVE_K_OUT.value,
+                                legal_value_list=get_enum_values(SplitMode)),
             ArgumentDescription(name="warm_n", type_=int, help_info="暖用户限制",
                                 default_value=5,
                                 lower_closed_bound=1),
@@ -89,13 +90,13 @@ class SimpleDataReader(IDataReader):
         super().check_argument_values(arguments)
 
         # 数据集划分模式
-        arguments["dataset_mode"] = DatasetMode(arguments["dataset_mode"])
+        arguments["dataset_mode"] = SplitMode(arguments["dataset_mode"])
 
         # 添加数据集描述信息
         dataset_description = cls.get_dataset_description(arguments["dataset"], arguments["append_id"])
         arguments["dataset_description"] = dataset_description
 
-    def __init__(self, dataset: str, dataset_mode: DatasetMode, warm_n: int, vt_ratio: float, leave_k: int,
+    def __init__(self, dataset: str, dataset_mode: SplitMode, warm_n: int, vt_ratio: float, leave_k: int,
                  neg_sample_n: int, load_feature: bool, append_id: bool, description: DatasetDescription,
                  train_mode: TrainMode, random_seed: int):
         """
@@ -147,7 +148,7 @@ class SimpleDataReader(IDataReader):
         """数据集加载过程，构造函数调用，子类应该重载"""
         self._load_interactions()
         self._split_interactions()
-        if self.dataset_mode == DatasetMode.LEAVE_K_OUT:
+        if self.dataset_mode == SplitMode.LEAVE_K_OUT:
             self._load_neg_sample()
         if self.load_feature:
             self._load_features()
@@ -171,15 +172,15 @@ class SimpleDataReader(IDataReader):
         logging.info('划分交互数据...')
         split_index_dir = os.path.join(DATASET_DIR, self.dataset, SPLIT_INDEX_DIR)
 
-        if self.dataset_mode == DatasetMode.SEQUENTIAL_SPLIT:
+        if self.dataset_mode == SplitMode.SEQUENTIAL_SPLIT:
             if (self.warm_n, self.vt_ratio) not in check_sequential_split(self.dataset):
                 logging.info(f"顺序划分_{self.warm_n}_{self.vt_ratio}不存在，划分数据...")
-                sequential_split(self.dataset, self.warm_n, self.vt_ratio)
+                generate_sequential_split(self.dataset, self.warm_n, self.vt_ratio)
             split_name = SEQUENTIAL_SPLIT_NAME_TEMPLATE % (self.warm_n, self.vt_ratio)
         else:  # self.dataset_mode == DatasetMode.LEAVE_K_OUT
             if (self.warm_n, self.leave_k) not in check_leave_k_out_split(self.dataset):
                 logging.info(f"留出划分_{self.warm_n}_{self.leave_k}不存在，划分数据...")
-                leave_k_out_split(self.dataset, self.warm_n, self.leave_k)
+                generate_leave_k_out_split(self.dataset, self.warm_n, self.leave_k)
             split_name = LEAVE_K_OUT_SPLIT_NAME_TEMPLATE % (self.warm_n, self.leave_k)
 
         self.train_index_array: ndarray = np.load(os.path.join(split_index_dir, TRAIN_INDEX_NPY_TEMPLATE % split_name))
@@ -349,7 +350,7 @@ class SimpleDataReader(IDataReader):
         dev_dataset_item = {
             INDEX: index,
             UID: self.dev_df[UID].values[index],
-            IID: self.dev_df[IID].values[index] if self.dataset_mode == DatasetMode.SEQUENTIAL_SPLIT else
+            IID: self.dev_df[IID].values[index] if self.dataset_mode == SplitMode.SEQUENTIAL_SPLIT else
             self.dev_iid_topk_array[index],
             RATE: self.dev_df[RATE].values[index],
             LABEL: self.dev_df[LABEL].values[index],
@@ -371,7 +372,7 @@ class SimpleDataReader(IDataReader):
         test_dataset_item = {
             INDEX: index,
             UID: self.test_df[UID].values[index],
-            IID: self.test_df[IID].values[index] if self.dataset_mode == DatasetMode.SEQUENTIAL_SPLIT else
+            IID: self.test_df[IID].values[index] if self.dataset_mode == SplitMode.SEQUENTIAL_SPLIT else
             self.test_iid_topk_array[index],
             RATE: self.test_df[RATE].values[index],
             LABEL: self.test_df[LABEL].values[index],
@@ -397,7 +398,7 @@ if __name__ == '__main__':
     with Timer():
         reader = SimpleDataReader(
             dataset='MovieLens-100K-P',
-            dataset_mode=DatasetMode.SEQUENTIAL_SPLIT,
+            dataset_mode=SplitMode.SEQUENTIAL_SPLIT,
             warm_n=5,
             vt_ratio=0.1,
             leave_k=1,
@@ -409,7 +410,7 @@ if __name__ == '__main__':
             random_seed=2020
         )
 
-    with Timer(10):
+    with Timer(divided_by=10):
         for i in range(10):
             reader.train_neg_sample()
 

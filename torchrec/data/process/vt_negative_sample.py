@@ -16,7 +16,7 @@ from torchrec.utils.const import *
 from torchrec.utils.system import check_dir_and_mkdir
 
 
-def generate_negative_sample(seed: int, dataset_name: str, sample_n: int) -> None:
+def generate_vt_negative_sample(seed: int, dataset_name: str, sample_n: int) -> None:
     """
     为验证集与测试集负采样，输出ndarray矩阵，形状为(USER_NUM, SAMPLE_NEG)，按照UID排序
     :param seed: 随机数种子
@@ -84,7 +84,7 @@ def generate_negative_sample(seed: int, dataset_name: str, sample_n: int) -> Non
                delimiter=SEP, fmt='%d')
 
 
-def check_negative_sample(dataset_name: str) -> List[int]:
+def check_vt_negative_sample(dataset_name: str) -> List[int]:
     """检查验证集与测试集负采样的采样长度列表"""
     import re
     sample_dir = os.path.join(DATASET_DIR, dataset_name, NEGATIVE_SAMPLE_DIR)

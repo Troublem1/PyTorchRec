@@ -6,9 +6,9 @@ import pickle as pkl
 from abc import abstractmethod, ABC
 from typing import Dict, Any
 
+from torchrec.data.dataset import DatasetDescription
 from torchrec.utils.argument import IWithArguments
 from torchrec.utils.const import *
-from .dataset import DatasetDescription
 
 
 class IDataReader(IWithArguments, ABC):
