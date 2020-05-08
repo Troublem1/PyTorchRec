@@ -1,7 +1,7 @@
 """
 离散分类特征类
 """
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from pandas import Series
 from pandas.api import types
@@ -23,7 +23,7 @@ class CategoricalColumnWithIdentity(CategoricalColumn):
         return batch[self.feature_name].long()
 
     @staticmethod
-    def from_series(feature_name: str, series: Series, other_info: Dict[str, Any]):
+    def from_series(feature_name: str, series: Series, other_info: Optional[Dict[str, Any]] = None):
         """从pandas.Series中构造"""
         assert types.is_integer_dtype(series), series.dtypes
         column = CategoricalColumnWithIdentity(
@@ -32,8 +32,9 @@ class CategoricalColumnWithIdentity(CategoricalColumn):
         )
         column.set_info(MIN, series.min())
         column.set_info(MAX, series.max())
-        for key, value in other_info.items():
-            column.set_info(key, value)
+        if other_info:
+            for key, value in other_info.items():
+                column.set_info(key, value)
         return column
 
     def __str__(self):
