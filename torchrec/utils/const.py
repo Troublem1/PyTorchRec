@@ -36,10 +36,13 @@ DEV_INDEX_NPY_TEMPLATE = "%s.dev_index.npy"  # 验证集集对应的interaction_
 TEST_INDEX_CSV_TEMPLATE = "%s.test_index.csv"  # 测试集对应的interaction_df的index，%s：划分名称
 TEST_INDEX_NPY_TEMPLATE = "%s.test_index.npy"  # 测试集对应的interaction_df的index，%s：划分名称
 
-STATISTIC_DIR = "STATISTIC"
+NEGATIVE_SAMPLE_DIR = "NEGATIVE_SAMPLE"
 
 USER_POS_HIS_SET_DICT_PKL = 'user_pos_his_set_dict.pkl'  # 正向交互信息构成集合按 uid 合并文件
-USER_NEG_HIS_SET_DICT_PKL = 'user_neg_his_set_dict.pkl'  # 负向交互信息构成集合按 uid 合并文件
+DEV_NEG_CSV_TEMPLATE = 'dev_neg_%d.csv'  # 验证集负采样文件
+DEV_NEG_NPY_TEMPLATE = 'dev_neg_%d.npy'  # 验证集负采样文件
+TEST_NEG_CSV_TEMPLATE = 'test_neg_%d.csv'  # 测试集负采样文件
+TEST_NEG_NPY_TEMPLATE = 'test_neg_%d.npy'  # 测试集负采样文件
 
 HISTORY_DIR = 'HISTORY'
 
@@ -47,13 +50,6 @@ POS_HIS_CSV_TEMPLATE = 'pos_his_%d.csv'  # 正向交互历史信息
 POS_HIS_NPY_TEMPLATE = 'pos_his_%d.npy'  # 正向交互历史信息
 NEG_HIS_CSV_TEMPLATE = 'neg_his_%d.csv'  # 负向交互历史信息
 NEG_HIS_NPY_TEMPLATE = 'neg_his_%d.npy'  # 负向交互历史信息
-
-NEGATIVE_SAMPLE_DIR = "NEGATIVE_SAMPLE"
-
-DEV_NEG_CSV_TEMPLATE = 'dev_neg_%d.csv'  # 验证集负采样文件
-DEV_NEG_NPY_TEMPLATE = 'dev_neg_%d.npy'  # 验证集负采样文件
-TEST_NEG_CSV_TEMPLATE = 'test_neg_%d.csv'  # 测试集负采样文件
-TEST_NEG_NPY_TEMPLATE = 'test_neg_%d.npy'  # 测试集负采样文件
 
 # 数据格式相关常量
 SEP = '\t'

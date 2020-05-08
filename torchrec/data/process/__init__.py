@@ -8,7 +8,5 @@ from torchrec.data.process.leave_k_out_split import check_leave_k_out_split
 from torchrec.data.process.leave_k_out_split import generate_leave_k_out_split
 from torchrec.data.process.sequential_split import check_sequential_split
 from torchrec.data.process.sequential_split import generate_sequential_split
-from torchrec.data.process.user_history_statistic import check_user_history_statistic
-from torchrec.data.process.user_history_statistic import generate_user_history_statistic
 from torchrec.data.process.vt_negative_sample import check_vt_negative_sample
 from torchrec.data.process.vt_negative_sample import generate_vt_negative_sample
