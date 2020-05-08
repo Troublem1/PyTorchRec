@@ -40,7 +40,7 @@ def generate_interaction_history_list(dataset_name: str, k: int) -> None:
     check_dir_and_mkdir(history_dir)
 
     logging.info(f'读取数据集{dataset_name}...')
-    interaction_df: DataFrame = pd.read_pickle(os.path.join(dataset_dir, BASE_INTERACTION_PKL))
+    interaction_df: DataFrame = pd.read_feather(os.path.join(dataset_dir, BASE_INTERACTION_FEATHER))
 
     need_neg = (interaction_df[LABEL] == 0).any()
 
