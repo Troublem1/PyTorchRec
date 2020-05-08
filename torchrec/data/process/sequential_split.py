@@ -22,7 +22,7 @@ def __get_warm_interaction_df(interaction_df: DataFrame, warm_n: int) -> DataFra
     uid_array: ndarray = pos_df[pos_df.groupby(UID)[UID].transform('count').ge(warm_n)][UID].unique()
     uid_set: Set[int] = set(uid_array)
     new_interaction_df = interaction_df[interaction_df[UID].isin(uid_set)]
-    logging.info(f'正向交互次数大于等于{warm_n}的用户交互总数：{len(interaction_df)}')
+    logging.info(f'正向交互次数大于等于{warm_n}的用户交互总数：{len(new_interaction_df)}')
     logging.info(f'正向交互次数大于等于{warm_n}的用户总数：{len(uid_array)}')
     return new_interaction_df
 
