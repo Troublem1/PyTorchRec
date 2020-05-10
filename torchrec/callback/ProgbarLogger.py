@@ -19,20 +19,17 @@ class Progbar(object):
                  target: Optional[int] = None,
                  width: int = 30,
                  verbose: int = 1,
-                 interval: float = 0.05,
-                 unit_name: str = 'batch'):
+                 interval: float = 0.05):
         """
         :param target:              总数
         :param width:               进度条宽度
         :param verbose:             0：不显示，1：显示进度+轮次结果，2：显示轮次结果
         :param interval:            最短更新时间间隔
-        :param unit_name:           单位，batch/sample
         """
         self.target: Optional[int] = target  # 总数
         self.width: int = width  # 进度条宽度
         self.verbose: int = verbose  # 显示粒度
         self.interval: float = interval  # 最短更新时间间隔
-        self.unit_name: str = unit_name  # 单位，batch/sample
 
         # 能否交互性的显示
         self._dynamic_display = ((hasattr(sys.stdout, 'isatty') and sys.stdout.isatty())
@@ -98,11 +95,11 @@ class Progbar(object):
 
             if self.target is None or finalize:
                 if time_per_unit >= 1 or time_per_unit == 0:
-                    info += ' %.0fs/%s' % (time_per_unit, self.unit_name)
+                    info += ' %.0fs/%s' % (time_per_unit, 'batch')
                 elif time_per_unit >= 1e-3:
-                    info += ' %.0fms/%s' % (time_per_unit * 1e3, self.unit_name)
+                    info += ' %.0fms/%s' % (time_per_unit * 1e3, 'batch')
                 else:
-                    info += ' %.0fus/%s' % (time_per_unit * 1e6, self.unit_name)
+                    info += ' %.0fus/%s' % (time_per_unit * 1e6, 'batch')
             else:
                 eta = time_per_unit * (self.target - current)
                 if eta > 3600:
@@ -151,34 +148,21 @@ class Progbar(object):
 class ProgbarLogger(ICallback):
     """进度记录器，显示进度、loss与其他评价指标"""
 
-    def __init__(self, count_mode='batches'):
-        """
-        :param count_mode: 基本单位，batches/samples
-        """
+    def __init__(self):
         super().__init__()
-        if count_mode == 'samples':
-            self.use_batches = False
-        elif count_mode == 'batches':
-            self.use_batches = True
-        else:
-            raise ValueError('Unknown `count_mode`: ' + str(count_mode))
-
         self.seen: int = 0
         self.progbar: Optional[Progbar] = None
         self.target: Optional[int] = None
         self.verbose: int = 1
         self.epochs: int = 1
-
         self._called_in_fit: bool = False
 
     def set_params(self, params: Dict):
         """设置参数"""
         self.verbose = params['verbose']
         self.epochs = params['epochs']
-        if self.use_batches and 'batches' in params:
+        if 'batches' in params:
             self.target = params['batches']
-        elif not self.use_batches and 'samples' in params:
-            self.target = params['samples']
         else:
             self.target = None  # 第一个epoch后会根据数量设定
 
@@ -192,13 +176,11 @@ class ProgbarLogger(ICallback):
         if self.progbar is None:
             self.progbar = Progbar(
                 target=self.target,
-                verbose=self.verbose,
-                unit_name='batch' if self.use_batches else 'sample')
+                verbose=self.verbose)
 
         logs = copy.copy(logs) if logs else {}
-        batch_size = logs.pop('size', 0)
         logs.pop('batch', None)
-        add_seen = 1 if self.use_batches else batch_size
+        add_seen = 1
         self.seen += add_seen
         self.progbar.update(self.seen, list(logs.items()), finalize=False)
 
