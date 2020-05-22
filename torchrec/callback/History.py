@@ -27,4 +27,4 @@ class History(ICallback):
         self.epoch.append(epoch)
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
-        self.recommender.history = self
+        self.model.history = self
