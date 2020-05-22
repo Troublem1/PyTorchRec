@@ -11,6 +11,11 @@ def empty_implementation(method: Callable):
     return method
 
 
+def is_empty_implementation(method: Callable):
+    """检查函数是否为空实现"""
+    return getattr(method, '_empty_implementation', False)
+
+
 class ICallback(ABC):
     """回调函数接口类"""
 
@@ -87,3 +92,18 @@ class ICallback(ABC):
     def on_predict_end(self, logs: Optional[Dict] = None):
         """预测结束的时候"""
         pass
+
+    def implements_train_batch_hooks(self):
+        """检查是否在训练批次上执行功能"""
+        return (not is_empty_implementation(self.on_train_batch_begin) or
+                not is_empty_implementation(self.on_train_batch_end))
+
+    def implements_test_batch_hooks(self):
+        """检查是否在测试批次上执行功能"""
+        return (not is_empty_implementation(self.on_test_batch_begin) or
+                not is_empty_implementation(self.on_test_batch_end))
+
+    def implements_predict_batch_hooks(self):
+        """检查是否在预测批次上执行功能"""
+        return (not is_empty_implementation(self.on_predict_batch_begin) or
+                not is_empty_implementation(self.on_predict_batch_end))
