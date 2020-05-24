@@ -4,6 +4,7 @@
 from typing import Callable
 
 import numpy as np
+import torch
 from torch import Tensor
 
 
@@ -39,3 +40,14 @@ def tensor_to_numpy_or_python_type(structure):
         return t
 
     return map_structure(_to_numpy_or_python_type, structure)
+
+
+def tensor_to_device(structure, device: torch.device):
+    """将数据结构中的tensor转移到相应设备，可以递归转化"""
+
+    def _to_device(t):
+        if isinstance(t, Tensor):
+            return t.to(device=device)
+        return t
+
+    return map_structure(_to_device, structure)
