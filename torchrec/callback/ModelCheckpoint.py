@@ -80,14 +80,14 @@ class ModelCheckpoint(ICallback):
                             print(f'\nEpoch {epoch + 1:05d}: {self.monitor} improved from {self.best:0.5f}'
                                   f' to {current:0.5f}, saving model to {filepath}')
                         self.best = current
-                        self.model.save_weights(filepath, overwrite=True)
+                        self.model.save_weights(filepath)
                     else:
                         if self.verbose > 0:
                             print(f'\nEpoch {epoch + 1:05d}: {self.monitor} did not improve from {self.best:0.5f}')
             else:
                 if self.verbose > 0:
                     print(f'\nEpoch {epoch + 1:05d}: saving model to {filepath}')
-                self.model.save_weights(filepath, overwrite=True)
+                self.model.save_weights(filepath)
 
     def _get_file_path(self, epoch, logs):
         try:
