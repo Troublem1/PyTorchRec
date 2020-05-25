@@ -2,6 +2,7 @@
 BPR损失
 """
 import torch
+import torch.nn.functional as F  # noqa
 from torch.nn.modules.loss import _Loss  # noqa
 
 
@@ -16,7 +17,7 @@ class BPRLoss(_Loss):
         assert len(input.shape) == 2 and input.shape[1] == 2, input.shape
         pos = input[:, 0]
         neg = input[:, 1]
-        ret = -torch.log2(torch.sigmoid(pos - neg))
+        ret = F.softplus(-(pos - neg))  # 数值稳定性优化
         if self.reduction != 'none':
             ret = torch.mean(ret) if self.reduction == 'mean' else torch.sum(ret)
         return ret
