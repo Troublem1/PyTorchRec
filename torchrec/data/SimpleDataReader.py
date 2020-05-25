@@ -5,20 +5,21 @@ ID数据加载器，加载数据集ID信息
 import gc
 import logging
 import pickle as pkl
-from typing import List, Dict, Any, Optional, Set
 
 import numpy as np
 import pandas as pd
 from numpy import ndarray
-from numpy.random import default_rng
+from numpy.random import default_rng  # noqa
 from pandas import DataFrame
 from tqdm import tqdm
+from typing import List, Dict, Any, Optional, Set
 
 from torchrec.data.IDataReader import IDataReader
 from torchrec.data.dataset import SplitMode
 from torchrec.data.process import check_dataset_info
 from torchrec.data.process import check_leave_k_out_split, generate_leave_k_out_split
 from torchrec.data.process import check_sequential_split, generate_sequential_split
+from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.task import TrainMode
 from torchrec.utils.argument import ArgumentDescription
 from torchrec.utils.const import *
@@ -36,9 +37,9 @@ class SimpleDataReader(IDataReader):
         RATE:       int
         LABEL:      int
         TIME:       int
-        c_XXX:      int/float  # 上下文特征，可选
-        u_XXX:      int/float  # 用户特征，可选
-        i_XXX:      int/float  # 物品特征，可选
+        c_c/n_XXX:  int/float  # 上下文特征，可选
+        u_c/n_XXX:  int/float  # 用户特征，可选
+        i_c/n_XXX:  int/float  # 物品特征，可选
     }
 
     TOPK推荐任务PAIRWISE模式训练集、TOPK推荐任务验证集、测试集：{
@@ -48,9 +49,9 @@ class SimpleDataReader(IDataReader):
         RATE:       int
         LABEL:      int
         TIME:       int
-        c_XXX:      int/float  # 上下文特征，可选
-        u_XXX:      int/float  # 用户特征，可选
-        i_XXX:      ndarray(int/float)  # 物品特征，可选
+        c_c/n_XXX:  int/float  # 上下文特征，可选
+        u_c/n_XXX:  int/float  # 用户特征，可选
+        i_c/n_XXX:  ndarray(int/float)  # 物品特征，可选
     }
     """
 
@@ -92,22 +93,22 @@ class SimpleDataReader(IDataReader):
         # 数据集划分模式
         arguments["split_mode"] = SplitMode(arguments["split_mode"])
 
-        # 添加数据集描述信息
-        dataset_description = cls.get_dataset_description(arguments["dataset"], arguments["append_id"])
-        arguments["uid_column"] = dataset_description.uid_column
-        arguments["iid_column"] = dataset_description.iid_column
-        arguments["rate_column"] = dataset_description.rate_column
-        arguments["label_column"] = dataset_description.label_column
-        arguments["time_column"] = dataset_description.time_column
-        arguments["user_columns"] = dataset_description.user_columns
-        arguments["item_columns"] = dataset_description.item_columns
-        arguments["context_columns"] = dataset_description.context_columns
-
-    def __init__(self, dataset: str, split_mode: SplitMode, warm_n: int, vt_ratio: float, leave_k: int,
-                 neg_sample_n: int, load_feature: bool, append_id: bool, train_mode: TrainMode, random_seed: int):
+    def __init__(self,
+                 dataset: str,
+                 split_mode: SplitMode,
+                 warm_n: int,
+                 vt_ratio: float,
+                 leave_k: int,
+                 neg_sample_n: int,
+                 load_feature: bool,
+                 append_id: bool,
+                 train_mode: TrainMode,
+                 random_seed: int,
+                 **kwargs):  # noqa
         """
         :param dataset: 数据集名称
         """
+        super().__init__()
         self.dataset = dataset
         self.split_mode = split_mode
         self.warm_n = warm_n
@@ -121,6 +122,8 @@ class SimpleDataReader(IDataReader):
 
         self.interaction_df: Optional[DataFrame] = None
         self.item_df: Optional[DataFrame] = None
+
+        self.feature_column_dict: Optional[Dict[str, CategoricalColumnWithIdentity]] = None
 
         self.train_index_array: Optional[ndarray] = None
         self.dev_index_array: Optional[ndarray] = None
@@ -146,6 +149,7 @@ class SimpleDataReader(IDataReader):
     def _load_dataset(self) -> None:
         """数据集加载过程，构造函数调用，子类应该重载"""
         self._load_interactions()
+        self._create_feature_column_dict()
         self._load_items()
         self._split_interactions()
         if self.split_mode == SplitMode.LEAVE_K_OUT:
@@ -164,6 +168,25 @@ class SimpleDataReader(IDataReader):
         logging.debug(self.interaction_df.info())
         logging.info('交互数据大小：%d' % len(self.interaction_df))
         logging.info('交互数据正负例统计：' + str(dict(self.interaction_df[LABEL].value_counts())))
+
+    def _create_feature_column_dict(self) -> None:
+        """生成数据列信息"""
+        self.feature_column_dict: Dict[str, CategoricalColumnWithIdentity] = {}
+        for column in self.interaction_df.columns:
+            self.feature_column_dict[column] = CategoricalColumnWithIdentity.from_series(
+                feature_name=column,
+                series=self.interaction_df[column]
+            )
+
+    def _load_items(self) -> None:
+        """加载物品数据"""
+        logging.info("加载物品数据...")
+        logging.debug("加载物品数据...")
+        self.item_df: DataFrame = pd.read_feather(os.path.join(DATASET_DIR, self.dataset, ITEM_FEATHER))
+        if not self.load_feature:
+            self.item_df = self.item_df[[IID]]
+        logging.debug(self.item_df.info())
+        logging.info('物品集大小：%d' % len(self.item_df))
 
     def _split_interactions(self) -> None:
         """分隔交互数据"""
@@ -230,16 +253,6 @@ class SimpleDataReader(IDataReader):
 
         assert self.dev_iid_topk_array.shape[1] == self.test_iid_topk_array.shape[1]
 
-    def _load_items(self) -> None:
-        """加载物品数据"""
-        logging.info("加载物品数据...")
-        logging.debug("加载物品数据...")
-        self.item_df: DataFrame = pd.read_feather(os.path.join(DATASET_DIR, self.dataset, ITEM_FEATHER))
-        if not self.load_feature:
-            self.item_df = self.item_df[[IID]]
-        logging.debug(self.item_df.info())
-        logging.info('物品集大小：%d' % len(self.item_df))
-
     def _prepare_train_neg_sample(self) -> None:
         """加载必要历史信息，为训练集负采样做准备工作"""
         logging.info('训练集负采样准备工作...')
@@ -284,6 +297,10 @@ class SimpleDataReader(IDataReader):
                 )
         self.train_iid_pair_array[:, 1] = neg_iid_array
         logging.info('训练集负采样结束')
+
+    def get_feature_column_dict(self) -> Dict[str, CategoricalColumnWithIdentity]:
+        """获取特征列信息"""
+        return self.feature_column_dict
 
     def get_train_dataset_size(self) -> int:
         """训练集大小"""
@@ -336,17 +353,18 @@ class SimpleDataReader(IDataReader):
 if __name__ == '__main__':
     from torchrec.utils.system import init_console_logger
     from torchrec.utils.timer import Timer
+    from pprint import pprint
 
     init_console_logger()
     with Timer():
         reader = SimpleDataReader(
-            dataset='Xing-PN',
+            dataset='MovieLens-100K-PN',
             split_mode=SplitMode.LEAVE_K_OUT,
             warm_n=5,
             vt_ratio=0.1,
             leave_k=1,
             neg_sample_n=99,
-            load_feature=False,
+            load_feature=True,
             append_id=True,
             train_mode=TrainMode.PAIR_WISE,
             random_seed=2020
@@ -362,3 +380,5 @@ if __name__ == '__main__':
     print(reader.get_train_dataset_item(0))
     print(reader.get_dev_dataset_item(0))
     print(reader.get_test_dataset_item(0))
+
+    pprint(reader.get_feature_column_dict())

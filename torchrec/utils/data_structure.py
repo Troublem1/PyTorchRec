@@ -1,11 +1,10 @@
 """
 与数据结构相关的辅助功能
 """
-from typing import Callable
-
 import numpy as np
 import torch
 from torch import Tensor
+from typing import Callable
 
 
 def map_structure(func: Callable, structure):
@@ -35,7 +34,7 @@ def tensor_to_numpy_or_python_type(structure):
 
     def _to_numpy_or_python_type(t):
         if isinstance(t, Tensor):
-            x = t.numpy()
+            x = t.detach().cpu().numpy()
             return x.item() if np.ndim(x) == 0 else x
         return t
 

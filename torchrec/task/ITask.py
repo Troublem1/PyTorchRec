@@ -13,3 +13,9 @@ class ITask(IWithArguments, ABC):
     def run(self):
         """执行任务"""
         pass
+
+    @classmethod
+    @abstractmethod
+    def create_from_console(cls):
+        """从控制台获取参数创建任务"""
+        pass

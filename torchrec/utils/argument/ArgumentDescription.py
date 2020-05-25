@@ -1,7 +1,19 @@
 """
 参数描述类，以兼容多种参数输入形式
 """
+import argparse
+from argparse import ArgumentParser
+
 from typing import Type, Any
+
+
+def str2bool(v):
+    if v.lower() == "true":
+        return True
+    elif v.lower() == "false":
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Unsupported value encountered.')
 
 
 class ArgumentDescription:
@@ -84,3 +96,12 @@ class ArgumentDescription:
                 assert value < self.upper_open_bound
             if self.upper_closed_bound:
                 assert value <= self.upper_closed_bound
+
+    def add_argument_into_argparser(self, parser: ArgumentParser):
+        """将参数信息添加到argparse.ArgumentParser"""
+        parser.add_argument(
+            "--" + self.name,
+            type=str2bool if self.type == bool else self.type,
+            help=self.help_info,
+            default=self.default_value,
+            required=(self.default_value is None))

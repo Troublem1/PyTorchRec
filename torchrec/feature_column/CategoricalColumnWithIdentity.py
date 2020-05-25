@@ -1,11 +1,10 @@
 """
 离散分类特征类
 """
-from typing import Dict, Any, Optional
-
 from pandas import Series
 from pandas.api import types
 from torch import Tensor
+from typing import Dict, Any, Optional
 
 from torchrec.feature_column.CategoricalColumn import CategoricalColumn
 from torchrec.utils.const import *
@@ -18,9 +17,9 @@ class CategoricalColumnWithIdentity(CategoricalColumn):
         super().__init__(category_num)
         self.feature_name = feature_name
 
-    def get_feature_data(self, batch: Dict[str, Any]) -> Tensor:
+    def get_feature_data(self, batch: Dict[str, Tensor]) -> Optional[Tensor]:
         """获取特征数据"""
-        return batch[self.feature_name].long()
+        return batch.get(self.feature_name).long()
 
     @staticmethod
     def from_series(feature_name: str, series: Series, other_info: Optional[Dict[str, Any]] = None):
@@ -42,3 +41,6 @@ class CategoricalColumnWithIdentity(CategoricalColumn):
         for key, value in self.get_info().items():
             s += f", {key}: {value}"
         return s
+
+    def __repr__(self):
+        return str(self)

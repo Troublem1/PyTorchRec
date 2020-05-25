@@ -1,9 +1,8 @@
 """
 模型检查点
 """
-from typing import Union, Optional, Dict
-
 import numpy as np
+from typing import Union, Optional, Dict
 
 from torchrec.callback.ICallback import ICallback
 
@@ -81,6 +80,7 @@ class ModelCheckpoint(ICallback):
                                   f' to {current:0.5f}, saving model to {filepath}')
                         self.best = current
                         self.model.save_weights(filepath)
+                        self.model.save_best_weights()
                     else:
                         if self.verbose > 0:
                             print(f'\nEpoch {epoch + 1:05d}: {self.monitor} did not improve from {self.best:0.5f}')
@@ -88,6 +88,7 @@ class ModelCheckpoint(ICallback):
                 if self.verbose > 0:
                     print(f'\nEpoch {epoch + 1:05d}: saving model to {filepath}')
                 self.model.save_weights(filepath)
+                self.model.save_best_weights()
 
     def _get_file_path(self, epoch, logs):
         try:

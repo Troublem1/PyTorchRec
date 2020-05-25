@@ -3,7 +3,7 @@
 """
 import logging
 
-import os
+from torchrec.utils.const import *
 
 
 def init_console_logger(level=logging.INFO) -> None:
@@ -25,3 +25,17 @@ def check_dir_and_mkdir(path: str) -> None:
         logging.info(f'新建文件夹：{dirname}')
         os.makedirs(dirname)
     return
+
+
+def check_important_dirs_and_mkdir():
+    """
+    检查模块重要文件夹是否已经建立
+    """
+    if not os.path.exists(DATASET_DIR):
+        raise RuntimeError(f"数据集目录不存在：{DATASET_DIR}")
+    # check_dir_and_mkdir(LOG_AND_RESULT_DIR)
+    # check_dir_and_mkdir(LOG_DIR)
+    # check_dir_and_mkdir(RESULT_DIR)
+    # check_dir_and_mkdir(MODEL_DIR)
+    # check_dir_and_mkdir(GRID_SEARCH_DIR)
+    # check_dir_and_mkdir(COMMAND_DIR)
