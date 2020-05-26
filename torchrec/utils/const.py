@@ -70,6 +70,10 @@ RATE = "rate"
 LABEL = 'label'
 TIME = 'time'
 IIDS = 'iids'
+POS_HIS_LEN = "pos_his_len"
+POS_HIS = "pos_his"
+NEG_HIS_LEN = "neg_his_len"
+NEG_HIS = "neg_his"
 
 # 数据集描述词典常量
 # 0.数据集描述

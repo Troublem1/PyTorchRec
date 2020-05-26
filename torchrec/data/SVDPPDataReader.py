@@ -63,10 +63,7 @@ class SVDPPDataReader(SimpleDataReader):
                  train_mode: TrainMode,
                  random_seed: int,
                  limit: int,
-                 **kwargs):  # noqa
-        """
-        :param dataset: 数据集名称
-        """
+                 ):  # noqa
         self.limit = limit
         self.train_all_his_dict: Dict[int, ndarray] = {}
         super().__init__(dataset, split_mode, warm_n, vt_ratio, leave_k, neg_sample_n, load_feature, append_id,

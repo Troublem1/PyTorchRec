@@ -38,11 +38,10 @@ if __name__ == '__main__':
             "iid_column": iid_column,
             "label_column": label_column,
             "emb_size": 64,
+            "layers": [64],
+            "dropout": 0.2,
         },
-        search_params={
-            "layers": [[32], [64], [128]],
-            "dropout": [0.2, 0.3, 0.4, 0.5, 0.6]
-        },
+        search_params={},
     )
 
     optimizer_params_list = create_params_list(
