@@ -4,6 +4,7 @@
 import copy
 import pickle
 from abc import ABC, abstractmethod
+from typing import Union, Optional, List, Dict
 
 import numpy as np
 import torch
@@ -12,7 +13,6 @@ from torch.nn import Module
 from torch.nn.modules.loss import _Loss  # noqa
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import Dataset, DataLoader
-from typing import Union, Optional, List, Dict
 
 from torchrec.callback.CallbackList import CallbackList
 from torchrec.callback.History import History
@@ -21,14 +21,15 @@ from torchrec.metric.IMetric import IMetric
 from torchrec.metric.MetricList import MetricList
 from torchrec.utils.argument import IWithArguments
 from torchrec.utils.data_structure import tensor_to_device
-
-
 # todo 参数相关两个函数
+from torchrec.utils.global_utils import set_torch_seed
+
 
 class IModel(Module, IWithArguments, ABC):
     """模型接口类"""
 
-    def __init__(self, **kwargs):  # noqa
+    def __init__(self, random_seed: int, **kwargs):  # noqa
+        set_torch_seed(random_seed)
         super().__init__()
 
         self.stop_training = False  # 部分回调会在这里停止训练，一旦设置为true，当前epoch结束后停止

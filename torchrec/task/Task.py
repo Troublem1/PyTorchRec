@@ -1,33 +1,30 @@
 """
 单次任务执行
 """
-import argparse
-import logging
+
+from typing import List, Dict, Any
 
 import torch
 from numpy.random import default_rng  # noqa
 from torch.nn.modules.loss import _Loss  # noqa
 from torch.optim.optimizer import Optimizer
-from typing import List, Dict, Any, Type
 
-from torchrec.callback.ICallback import ICallback
+from torchrec.callback.CSVLogger import CSVLogger
+from torchrec.callback.EarlyStopping import EarlyStopping
+from torchrec.callback.ModelCheckpoint import ModelCheckpoint
 from torchrec.data.IDataReader import IDataReader
 from torchrec.data.adapter import TrainDataset, DevDataset, TestDataset
-from torchrec.loss.losses import loss_name_list, get_loss
+from torchrec.loss.losses import loss_name_list
 from torchrec.metric import IMetric
-from torchrec.metric.metrics import get_metric
 from torchrec.model import IModel
 from torchrec.model.models import (
-    model_name_list,
-    get_model_type,
-    get_data_reader_type)
-from torchrec.optim.optimizers import optimizer_name_list, get_optimizer
+    model_name_list)
+from torchrec.optim.optimizers import optimizer_name_list
 from torchrec.task import TrainMode
 from torchrec.task.ITask import ITask
 from torchrec.utils.argument.ArgumentDescription import ArgumentDescription
 from torchrec.utils.enum import get_enum_values
 from torchrec.utils.global_utils import set_torch_seed
-from torchrec.utils.system import init_console_logger
 
 
 class Task(ITask):
@@ -101,74 +98,75 @@ class Task(ITask):
 
     @classmethod
     def create_from_console(cls):
-        """从控制台创建任务"""
-        init_console_logger(logging.INFO)
+        pass
 
-        # 获取模型类型
-        init_parser = argparse.ArgumentParser(add_help=False)
-        init_parser.add_argument('--model_name', type=str, help='模型名称', choices=model_name_list)
-        init_args, init_extras = init_parser.parse_known_args()
-        logging.info(init_args.__dict__)
-        logging.info(init_extras)
-
-        # 获取数据载入器类型
-        model_type: Type[IModel] = get_model_type(init_args.model_name)
-        data_reader_type: Type[IDataReader] = get_data_reader_type(model_type)
-
-        # 解析参数
-        parser = argparse.ArgumentParser(add_help=False)
-        argument_descriptions = (
-                data_reader_type.get_argument_descriptions()
-                + model_type.get_argument_descriptions()
-                + cls.get_argument_descriptions()
-        )
-        for description in argument_descriptions:
-            description.add_argument_into_argparser(parser)
-        origin_args, extras = parser.parse_known_args()
-        arguments = origin_args.__dict__
-
-        data_reader_type.check_argument_values(arguments)
-        model_type.check_argument_values(arguments)
-        cls.check_argument_values(arguments)
-        logging.info(arguments)
-        logging.info(extras)
-
-        logging.info(f'任务类：{cls}')
-        logging.info(f'数据加载类：{data_reader_type}')
-        logging.info(f'模型类：{model_type}')
-
-        data_reader: IDataReader = data_reader_type(**arguments)
-        # todo 扩充特征列信息
-
-        model: IModel = model_type(feature_column_dict=data_reader.get_feature_column_dict(), **arguments)
-
-        optimizer_type: Type[Optimizer] = get_optimizer(arguments["optimizer"])
-        optimizer: Optimizer = optimizer_type(lr=arguments["lr"], weight_decay=arguments["l2"])  # noqa
-
-        loss: _Loss = get_loss(arguments["loss"])()
-
-        return cls(
-            debug=arguments["debug"],
-            gpu=arguments["gpu"],
-            random_seed=arguments["random_seed"],
-            metrics=arguments["metrics"],
-            train_mode=arguments["train_mode"],
-            data_reader=data_reader,
-            model=model,
-            epoch=arguments["epoch"],
-            batch_size=arguments["batch_size"],
-            optimizer=optimizer,
-            loss=loss,
-            callbacks=[],
-            num_workers=arguments["num_workers"],
-            dev_freq=arguments["dev_freq"],
-        )
+    #     """从控制台创建任务"""
+    #     init_console_logger(logging.INFO)
+    #
+    #     # 获取模型类型
+    #     init_parser = argparse.ArgumentParser(add_help=False)
+    #     init_parser.add_argument('--model_name', type=str, help='模型名称', choices=model_name_list)
+    #     init_args, init_extras = init_parser.parse_known_args()
+    #     logging.info(init_args.__dict__)
+    #     logging.info(init_extras)
+    #
+    #     # 获取数据载入器类型
+    #     model_type: Type[IModel] = get_model_type(init_args.model_name)
+    #     data_reader_type: Type[IDataReader] = get_data_reader_type(model_type)
+    #
+    #     # 解析参数
+    #     parser = argparse.ArgumentParser(add_help=False)
+    #     argument_descriptions = (
+    #             data_reader_type.get_argument_descriptions()
+    #             + model_type.get_argument_descriptions()
+    #             + cls.get_argument_descriptions()
+    #     )
+    #     for description in argument_descriptions:
+    #         description.add_argument_into_argparser(parser)
+    #     origin_args, extras = parser.parse_known_args()
+    #     arguments = origin_args.__dict__
+    #
+    #     data_reader_type.check_argument_values(arguments)
+    #     model_type.check_argument_values(arguments)
+    #     cls.check_argument_values(arguments)
+    #     logging.info(arguments)
+    #     logging.info(extras)
+    #
+    #     logging.info(f'任务类：{cls}')
+    #     logging.info(f'数据加载类：{data_reader_type}')
+    #     logging.info(f'模型类：{model_type}')
+    #
+    #     data_reader: IDataReader = data_reader_type(**arguments)
+    #     # todo 扩充特征列信息
+    #
+    #     model: IModel = model_type(feature_column_dict=data_reader.get_feature_column_dict(), **arguments)
+    #
+    #     optimizer_type: Type[Optimizer] = get_optimizer(arguments["optimizer"])
+    #     optimizer: Optimizer = optimizer_type(lr=arguments["lr"], weight_decay=arguments["l2"])  # noqa
+    #
+    #     loss: _Loss = get_loss(arguments["loss"])()
+    #
+    #     return cls(
+    #         debug=arguments["debug"],
+    #         gpu=arguments["gpu"],
+    #         random_seed=arguments["random_seed"],
+    #         metrics=arguments["metrics"],
+    #         train_mode=arguments["train_mode"],
+    #         data_reader=data_reader,
+    #         model=model,
+    #         epoch=arguments["epoch"],
+    #         batch_size=arguments["batch_size"],
+    #         optimizer=optimizer,
+    #         loss=loss,
+    #         callbacks=[],
+    #         num_workers=arguments["num_workers"],
+    #         dev_freq=arguments["dev_freq"],
+    #     )
 
     def __init__(self,
-                 debug: bool,
                  gpu: int,
                  random_seed: int,
-                 metrics: List[str],
+                 metrics: List[IMetric],
                  train_mode: TrainMode,
                  data_reader: IDataReader,
                  model: IModel,
@@ -176,18 +174,20 @@ class Task(ITask):
                  batch_size: int,
                  optimizer: Optimizer,
                  loss: _Loss,
-                 callbacks: List[ICallback],
                  num_workers: int,
                  dev_freq: int,
+                 filename: str,
+                 monitor: str,
+                 monitor_mode: str,
+                 patience: int,
                  ):
-        self.debug = debug
         if gpu == -1:
             self.device = torch.device("cpu")
         else:
             self.device = torch.device(f"cuda:{gpu}")
         self.rng = default_rng(random_seed)
         set_torch_seed(random_seed)
-        self.metrics: List[IMetric] = list(map(get_metric, metrics))
+        self.metrics: List[IMetric] = metrics
         self.train_mode = train_mode
         self.data_reader = data_reader
         self.train_dataset = TrainDataset(data_reader)
@@ -198,9 +198,12 @@ class Task(ITask):
         self.batch_size = batch_size
         self.optimizer = optimizer
         self.loss = loss
-        self.callbacks = callbacks
         self.num_workers = num_workers
         self.dev_freq = dev_freq
+        self.filename = filename
+        self.monitor = monitor
+        self.monitor_mode = monitor_mode
+        self.patience = patience
 
     def run(self):
         """执行任务"""
@@ -211,23 +214,52 @@ class Task(ITask):
             device=self.device,
         )
 
-        self.model.fit(
+        history = self.model.fit(
             dataset=self.train_dataset,
             batch_size=self.batch_size,
             epochs=self.epoch,
             dev_dataset=self.dev_dataset,
             verbose=1,
-            callbacks=self.callbacks,
+            callbacks=[
+                ModelCheckpoint(
+                    filepath=f"{self.filename}.pt",
+                    monitor=self.monitor,
+                    verbose=1,
+                    save_best_only=True,
+                    mode=self.monitor_mode,
+                    save_freq="epoch"),
+                CSVLogger(
+                    filename=f"{self.filename}.csv",
+                    separator="\t"),
+                EarlyStopping(
+                    monitor=self.monitor,
+                    patience=self.patience,
+                    verbose=1,
+                    mode=self.monitor_mode),
+            ],
             shuffle=True,
             workers=self.num_workers,
-            drop_last=False,
+            drop_last=True,
             dev_freq=self.dev_freq,
         )
 
-        self.model.evaluate(
+        best_epoch, best_dev_logs = history.get_best_epoch_logs(
+            monitor=self.monitor,
+            monitor_mode=self.monitor_mode,
+        )
+
+        self.model.load_best_weights()
+
+        test_logs = self.model.evaluate(
             dataset=self.test_dataset,
             batch_size=self.batch_size,
             verbose=1,
-            callbacks=self.callbacks,
+            callbacks=[
+                CSVLogger(
+                    filename=f"{self.filename}.test.csv",
+                    separator="\t"),
+            ],
             workers=self.num_workers,
         )
+
+        return best_epoch, best_dev_logs, test_logs

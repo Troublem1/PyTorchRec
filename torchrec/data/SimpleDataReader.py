@@ -5,6 +5,7 @@ ID数据加载器，加载数据集ID信息
 import gc
 import logging
 import pickle as pkl
+from typing import List, Dict, Any, Optional, Set
 
 import numpy as np
 import pandas as pd
@@ -12,7 +13,6 @@ from numpy import ndarray
 from numpy.random import default_rng  # noqa
 from pandas import DataFrame
 from tqdm import tqdm
-from typing import List, Dict, Any, Optional, Set
 
 from torchrec.data.IDataReader import IDataReader
 from torchrec.data.dataset import SplitMode
@@ -108,8 +108,7 @@ class SimpleDataReader(IDataReader):
         """
         :param dataset: 数据集名称
         """
-        super().__init__()
-        self.dataset = dataset
+        super().__init__(dataset)
         self.split_mode = split_mode
         self.warm_n = warm_n
         self.vt_ratio = vt_ratio

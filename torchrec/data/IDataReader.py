@@ -3,7 +3,6 @@
 可以通过Dataset类与DataLoader类以批量形式提供数据
 """
 from abc import abstractmethod, ABC
-
 from typing import Dict, Any
 
 from torchrec.feature_column import CategoricalColumnWithIdentity
@@ -13,18 +12,8 @@ from torchrec.utils.argument import IWithArguments
 class IDataReader(IWithArguments, ABC):
     """数据读入接口类"""
 
-    # @staticmethod
-    # def get_dataset_description(dataset_name: str, append_id: bool) -> DatasetDescription:
-    #     """获取数据集信息供其他模块使用"""
-    #     with open(os.path.join(DATASET_DIR, dataset_name, DESCRIPTION_PKL), "rb") as dataset_description_pkl:
-    #         dataset_description: DatasetDescription = pkl.load(dataset_description_pkl)
-    #     if append_id:
-    #         assert dataset_description.uid_column is not None and dataset_description.iid_column is not None
-    #         dataset_description.user_columns.insert(0, dataset_description.uid_column)
-    #         dataset_description.item_columns.insert(0, dataset_description.iid_column)
-    #     return dataset_description
-
-    def __init__(self, **kwargs):
+    def __init__(self, dataset: str, **kwargs):
+        self.dataset = dataset
         super().__init__()
 
     @abstractmethod
