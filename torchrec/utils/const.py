@@ -16,6 +16,9 @@ else:
 # 数据路径常量
 RAW_DATA_DIR = os.path.join(WORK_DIR, 'RawData')  # 原始数据目录
 DATASET_DIR = os.path.join(WORK_DIR, 'Dataset')  # 过滤并格式化数据目录(通常包含base_interaction.csv, interaction.csv)
+LOG_DIR = os.path.join(WORK_DIR, 'Log')
+MODEL_DIR = os.path.join(WORK_DIR, 'Model')
+GRID_SEARCH_DIR = os.path.join(WORK_DIR, 'GridSearch')
 
 BASE_INTERACTION_CSV = 'base_interaction.csv'  # 用户ID、物品ID、评分、标签、时间戳信息
 BASE_INTERACTION_FEATHER = 'base_interaction.feather'  # 用户ID、物品ID、评分、标签、时间戳信息
@@ -66,6 +69,7 @@ IID = 'iid'
 RATE = "rate"
 LABEL = 'label'
 TIME = 'time'
+IIDS = 'iids'
 
 # 数据集描述词典常量
 # 0.数据集描述

@@ -151,33 +151,29 @@ class ProgbarLogger(ICallback):
     def __init__(self):
         super().__init__()
         self.seen: int = 0
-        self.progbar: Optional[Progbar] = None
         self.target: Optional[int] = None
         self.verbose: int = 1
         self.epochs: int = 1
         self._called_in_fit: bool = False
+        self.progbar: Optional[Progbar] = None
 
     def set_params(self, params: Dict):
         """设置参数"""
         self.verbose = params['verbose']
         self.epochs = params['epochs']
-        if 'batches' in params:
-            self.target = params['batches']
-        else:
-            self.target = None  # 第一个epoch后会根据数量设定
+        self.target = params['batches']
+        self.progbar = Progbar(
+            target=self.target,
+            verbose=self.verbose)
 
     def _reset_progbar(self):
         """重置"""
         self.seen: int = 0
-        self.progbar: Optional[Progbar] = None
+        self.progbar: Optional[Progbar] = Progbar(
+            target=self.target,
+            verbose=self.verbose)
 
     def _batch_update_progbar(self, logs: Optional[Dict] = None):
-        """更新"""
-        if self.progbar is None:
-            self.progbar = Progbar(
-                target=self.target,
-                verbose=self.verbose)
-
         logs = copy.copy(logs) if logs else {}
         logs.pop('batch', None)
         add_seen = 1

@@ -1,7 +1,6 @@
 """
 单次任务执行
 """
-
 from typing import List, Dict, Any
 
 import torch
@@ -23,6 +22,7 @@ from torchrec.optim.optimizers import optimizer_name_list
 from torchrec.task import TrainMode
 from torchrec.task.ITask import ITask
 from torchrec.utils.argument.ArgumentDescription import ArgumentDescription
+from torchrec.utils.const import *
 from torchrec.utils.enum import get_enum_values
 from torchrec.utils.global_utils import set_torch_seed
 
@@ -164,6 +164,7 @@ class Task(ITask):
     #     )
 
     def __init__(self,
+                 debug: bool,
                  gpu: int,
                  random_seed: int,
                  metrics: List[IMetric],
@@ -180,7 +181,9 @@ class Task(ITask):
                  monitor: str,
                  monitor_mode: str,
                  patience: int,
+                 verbose: int,
                  ):
+        self.debug = debug
         if gpu == -1:
             self.device = torch.device("cpu")
         else:
@@ -204,6 +207,7 @@ class Task(ITask):
         self.monitor = monitor
         self.monitor_mode = monitor_mode
         self.patience = patience
+        self.verbose = verbose
 
     def run(self):
         """执行任务"""
@@ -214,33 +218,36 @@ class Task(ITask):
             device=self.device,
         )
 
+        model_checkpoint = ModelCheckpoint(
+            filepath=os.path.join(MODEL_DIR, f"{self.filename}.pt"),
+            monitor=self.monitor,
+            verbose=1,
+            save_best_only=True,
+            mode=self.monitor_mode,
+            save_freq="epoch")
+
+        csv_logger = CSVLogger(
+            filename=os.path.join(LOG_DIR, f"{self.filename}.csv"),
+            separator="\t")
+
+        early_stopping = EarlyStopping(
+            monitor=self.monitor,
+            patience=self.patience,
+            verbose=1,
+            mode=self.monitor_mode)
+
         history = self.model.fit(
             dataset=self.train_dataset,
             batch_size=self.batch_size,
             epochs=self.epoch,
             dev_dataset=self.dev_dataset,
-            verbose=1,
-            callbacks=[
-                ModelCheckpoint(
-                    filepath=f"{self.filename}.pt",
-                    monitor=self.monitor,
-                    verbose=1,
-                    save_best_only=True,
-                    mode=self.monitor_mode,
-                    save_freq="epoch"),
-                CSVLogger(
-                    filename=f"{self.filename}.csv",
-                    separator="\t"),
-                EarlyStopping(
-                    monitor=self.monitor,
-                    patience=self.patience,
-                    verbose=1,
-                    mode=self.monitor_mode),
-            ],
+            verbose=self.verbose,
+            callbacks=[early_stopping] if self.debug else [model_checkpoint, csv_logger, early_stopping],
             shuffle=True,
             workers=self.num_workers,
             drop_last=True,
             dev_freq=self.dev_freq,
+            train_mode=self.train_mode,
         )
 
         best_epoch, best_dev_logs = history.get_best_epoch_logs(
@@ -250,15 +257,15 @@ class Task(ITask):
 
         self.model.load_best_weights()
 
+        test_csv_logger = CSVLogger(
+            filename=os.path.join(LOG_DIR, f"{self.filename}.test.csv"),
+            separator="\t")
+
         test_logs = self.model.evaluate(
             dataset=self.test_dataset,
             batch_size=self.batch_size,
-            verbose=1,
-            callbacks=[
-                CSVLogger(
-                    filename=f"{self.filename}.test.csv",
-                    separator="\t"),
-            ],
+            verbose=self.verbose,
+            callbacks=[] if self.debug else [test_csv_logger],
             workers=self.num_workers,
         )
 

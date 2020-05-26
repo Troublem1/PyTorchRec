@@ -13,16 +13,22 @@ from torch.nn import Module
 from torch.nn.modules.loss import _Loss  # noqa
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
 
 from torchrec.callback.CallbackList import CallbackList
 from torchrec.callback.History import History
 from torchrec.callback.ICallback import ICallback
+from torchrec.data.adapter import TrainDataset
 from torchrec.metric.IMetric import IMetric
 from torchrec.metric.MetricList import MetricList
+from torchrec.task import TrainMode
 from torchrec.utils.argument import IWithArguments
 from torchrec.utils.data_structure import tensor_to_device
 # todo 参数相关两个函数
 from torchrec.utils.global_utils import set_torch_seed
+
+
+# todo 为了性能，临时删除batch回调，使用tqdm
 
 
 class IModel(Module, IWithArguments, ABC):
@@ -115,17 +121,18 @@ class IModel(Module, IWithArguments, ABC):
         return {"loss": loss}
 
     def fit(self,
-            dataset: Dataset,
+            dataset: TrainDataset,
             batch_size: int,
             epochs: int,
             dev_dataset: Optional[Dataset],
+            train_mode: TrainMode,
             verbose: int = 1,
             callbacks: Optional[Union[List[ICallback], CallbackList]] = None,
             shuffle: bool = True,
             workers: int = 0,
             drop_last: bool = False,
             dev_batch_size: Optional[int] = None,
-            dev_freq: int = 1
+            dev_freq: int = 1,
             ) -> History:
         """
         训练过程
@@ -133,6 +140,7 @@ class IModel(Module, IWithArguments, ABC):
         :param batch_size: 批次大小
         :param epochs: 轮次数
         :param dev_dataset: 验证集
+        :param train_mode: 训练模式
         :param verbose: 0：不显示/1：进度条/2：每轮次显示最终结果
         :param callbacks: 回调列表
         :param shuffle: 是否打乱训练集
@@ -162,19 +170,21 @@ class IModel(Module, IWithArguments, ABC):
 
         self.stop_training = False
         callbacks.on_train_begin()
-        batch = 0
+        # batch = 0
         logs = {}
         for epoch in range(epochs):
             callbacks.on_epoch_begin(epoch)
+            if train_mode == TrainMode.PAIR_WISE:
+                dataset.train_neg_sample()
             data_loader = DataLoader(dataset=dataset,
                                      batch_size=batch_size,
                                      shuffle=shuffle,
                                      num_workers=workers,
                                      drop_last=drop_last)
-            for data in data_loader:
-                callbacks.on_train_batch_begin(batch)
+            for data in tqdm(data_loader, leave=False):
+                # callbacks.on_train_batch_begin(batch)
                 logs = self.train_step(data)
-                callbacks.on_train_batch_end(batch, logs)
+                # callbacks.on_train_batch_end(batch, logs)
             epoch_logs = copy.copy(logs)
 
             if (epoch + 1) % dev_freq == 0:
@@ -230,12 +240,12 @@ class IModel(Module, IWithArguments, ABC):
         predictions: List[ndarray] = []
         targets: List[ndarray] = []
 
-        for batch, data in enumerate(data_loader):
-            callbacks.on_test_batch_begin(batch)
+        for batch, data in tqdm(enumerate(data_loader), leave=False):
+            # callbacks.on_test_batch_begin(batch)
             prediction, target = self.test_step(data)
             predictions.append(prediction.detach().cpu().numpy())
             targets.append(target.detach().cpu().numpy())
-            callbacks.on_test_batch_end(batch)
+            # callbacks.on_test_batch_end(batch)
 
         predictions: ndarray = np.concatenate(predictions)
         targets: ndarray = np.concatenate(targets)
@@ -279,11 +289,11 @@ class IModel(Module, IWithArguments, ABC):
 
         predictions: List[ndarray] = []
 
-        for batch, data in enumerate(data_loader):
-            callbacks.on_predict_batch_begin(batch)
+        for batch, data in tqdm(enumerate(data_loader), leave=False):
+            # callbacks.on_predict_batch_begin(batch)
             prediction = self.evaluate_step(data)
             predictions.append(prediction.detach().cpu().numpy())
-            callbacks.on_predict_batch_end(batch)
+            # callbacks.on_predict_batch_end(batch)
 
         predictions: ndarray = np.concatenate(predictions)
 
