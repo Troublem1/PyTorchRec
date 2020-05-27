@@ -58,6 +58,13 @@ POS_HIS_NPY_TEMPLATE = 'pos_his_%d.npy'  # 正向交互历史信息
 NEG_HIS_CSV_TEMPLATE = 'neg_his_%d.csv'  # 负向交互历史信息
 NEG_HIS_NPY_TEMPLATE = 'neg_his_%d.npy'  # 负向交互历史信息
 
+NEXT_STATE_DIR = 'NEXT_STATE'
+
+POS_NEXT_STATE_CSV_TEMPLATE = 'pos_next_state_%d.csv'  # 正向交互历史信息
+POS_NEXT_STATE_NPY_TEMPLATE = 'pos_next_state_%d.npy'  # 正向交互历史信息
+NEG_NEXT_STATE_CSV_TEMPLATE = 'neg_next_state_%d.csv'  # 负向交互历史信息
+NEG_NEXT_STATE_NPY_TEMPLATE = 'neg_next_state_%d.npy'  # 负向交互历史信息
+
 # 数据格式相关常量
 SEP = '\t'
 SEQ_SEP = ","
@@ -74,6 +81,10 @@ POS_HIS_LEN = "pos_his_len"
 POS_HIS = "pos_his"
 NEG_HIS_LEN = "neg_his_len"
 NEG_HIS = "neg_his"
+POS_NEXT_STATE_LEN = "pos_next_state_len"
+POS_NEXT_STATE = "pos_next_state"
+NEG_NEXT_STATE_LEN = "neg_next_state_len"
+NEG_NEXT_STATE = "neg_next_state"
 
 # 数据集描述词典常量
 # 0.数据集描述

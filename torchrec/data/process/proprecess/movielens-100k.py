@@ -10,10 +10,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from torchrec.data.dataset import DatasetDescription
-from torchrec.data.process import generate_interaction_history_list
-from torchrec.data.process import generate_leave_k_out_split
-from torchrec.data.process import generate_sequential_split
-from torchrec.data.process import generate_vt_negative_sample
+from torchrec.data.process import generate_interaction_next_state_list
 from torchrec.data.process.feature_process import get_int_map, get_bucketize_fn
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.utils.const import *
@@ -37,7 +34,7 @@ def format_data(dataset_name: str, rank_to_label: Dict, info: str) -> None:
     description = DatasetDescription(info)
 
     logging.info('读入用户数据...')
-    U_AGE, U_GENDER, U_OCCUPATION = "u_c_age", "u_c_gender", "u_c_occupation"
+    U_AGE, U_GENDER, U_OCCUPATION = "u_c_age", "u_c_gender", "u_c_occupation"  # noqa
     user_usecols = [0, 1, 2, 3]
     user_dtype_dict = {0: np.int32, 1: np.int32, 2: np.str, 3: np.str}
     user_df: DataFrame = pd.read_csv(os.path.join(RAW_DATA_DIR, RAW_DATA_NAME, RAW_USER_NAME), sep='|', header=None,
@@ -153,7 +150,7 @@ def format_data(dataset_name: str, rank_to_label: Dict, info: str) -> None:
     check_dir_and_mkdir(dataset_dir)
 
     logging.info('保存数据...')
-    assert (interaction_df.dtypes == np.int32).all(), interaction_df.dtypes
+    assert (interaction_df.dtypes == np.int32).all(), interaction_df.dtypes  # noqa
     base_interaction_df = merge_interaction_df[[UID, IID, RATE, LABEL, TIME]]
     base_interaction_df.to_csv(os.path.join(dataset_dir, BASE_INTERACTION_CSV), index=False, sep=SEP)
     base_interaction_df.to_feather(os.path.join(dataset_dir, BASE_INTERACTION_FEATHER))
@@ -174,23 +171,25 @@ if __name__ == '__main__':
     init_console_logger(logging.DEBUG)
 
     dataset_name = RAW_DATA_NAME + "-PN"
-    format_data(
-        dataset_name=dataset_name,
-        rank_to_label={1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
-        info="正负例化的MovieLens-100K数据集，评分为4/5为正例，评分为1/2/3为负例"
-    )
-    generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
-    generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
-    generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
-    generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    # format_data(
+    #     dataset_name=dataset_name,
+    #     rank_to_label={1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
+    #     info="正负例化的MovieLens-100K数据集，评分为4/5为正例，评分为1/2/3为负例"
+    # )
+    # generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
+    # generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
+    # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
+    # generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
 
     dataset_name = RAW_DATA_NAME + "-P"
-    format_data(
-        dataset_name=dataset_name,
-        rank_to_label={1: 1, 2: 1, 3: 1, 4: 1, 5: 1},
-        info="全部视为正例的MovieLens-100K数据集，评分为1/2/3/4/5为正例"
-    )
-    generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
-    generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
-    generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
-    generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    # format_data(
+    #     dataset_name=dataset_name,
+    #     rank_to_label={1: 1, 2: 1, 3: 1, 4: 1, 5: 1},
+    #     info="全部视为正例的MovieLens-100K数据集，评分为1/2/3/4/5为正例"
+    # )
+    # generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
+    # generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
+    # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
+    # generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    generate_interaction_next_state_list(dataset_name=dataset_name, k=10)

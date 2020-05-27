@@ -4,7 +4,7 @@ import numpy as np
 from numpy import ndarray
 from numpy.random import default_rng  # noqa
 
-from torchrec.data.SimpleDataReader import SimpleDataReader
+from torchrec.data.HistoryDataReader import HistoryDataReader
 from torchrec.data.dataset import SplitMode
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.task import TrainMode
@@ -12,7 +12,7 @@ from torchrec.utils.argument import ArgumentDescription
 from torchrec.utils.const import *
 
 
-class HistoryDataReader(SimpleDataReader):
+class ValueRLDataReader(HistoryDataReader):
     @classmethod
     def get_argument_descriptions(cls) -> List[ArgumentDescription]:
         pass
@@ -35,16 +35,17 @@ class HistoryDataReader(SimpleDataReader):
                  max_his_len: int,
                  use_neg_his: bool,
                  ):
-        self.max_his_len = max_his_len
-        self.use_neg_his = use_neg_his
+        self.max_next_state_len = max_his_len
+        self.use_neg_next_state = use_neg_his
         super().__init__(dataset, split_mode, warm_n, vt_ratio, leave_k, neg_sample_n, load_feature, append_id,
-                         train_mode, random_seed)
+                         train_mode, random_seed, max_his_len, use_neg_his)
 
     def _load_dataset(self) -> None:
         """数据集加载过程，构造函数调用，子类应该重载"""
         self._load_interactions()
         self._create_feature_column_dict()
         self._load_history()  # todo 会在df中加入列表，与目前的列值不相容，之后添加功能
+        self._load_next_state()  # todo 会在df中加入列表，与目前的列值不相容，之后添加功能
         self._load_items()
         self._split_interactions()
         if self.split_mode == SplitMode.LEAVE_K_OUT:
@@ -52,31 +53,34 @@ class HistoryDataReader(SimpleDataReader):
         if self.train_mode == TrainMode.PAIR_WISE:
             self._prepare_train_neg_sample()
 
-    def _load_history(self) -> None:
-        history_dir = os.path.join(DATASET_DIR, self.dataset, HISTORY_DIR)
+    def _load_next_state(self) -> None:
+        mext_state_dir = os.path.join(DATASET_DIR, self.dataset, NEXT_STATE_DIR)
 
-        pos_his_npy = os.path.join(history_dir, POS_HIS_NPY_TEMPLATE % self.max_his_len)
-        pos_his_mix_array: ndarray = np.load(pos_his_npy)
-        assert pos_his_mix_array.shape[0] == len(self.interaction_df)
-        self.interaction_df[POS_HIS_LEN] = pos_his_mix_array[:, 0].clip(min=1)
-        self.interaction_df[POS_HIS] = list(pos_his_mix_array[:, 1:])
+        pos_next_state_npy = os.path.join(mext_state_dir, POS_NEXT_STATE_NPY_TEMPLATE % self.max_next_state_len)
+        pos_next_state_mix_array: ndarray = np.load(pos_next_state_npy)
+        assert pos_next_state_mix_array.shape[0] == len(self.interaction_df)
+        self.interaction_df[POS_NEXT_STATE_LEN] = pos_next_state_mix_array[:, 0].clip(min=1)
+        self.interaction_df[POS_NEXT_STATE] = list(pos_next_state_mix_array[:, 1:])
 
-        if self.use_neg_his:
-            neg_his_npy = os.path.join(history_dir, NEG_HIS_NPY_TEMPLATE % self.max_his_len)
-            neg_his_mix_array: ndarray = np.load(neg_his_npy)
-            assert neg_his_mix_array.shape[0] == len(self.interaction_df)
-            self.interaction_df[NEG_HIS_LEN] = neg_his_mix_array[:, 0].clip(min=1)
-            self.interaction_df[NEG_HIS] = list(neg_his_mix_array[:, 1:])
+        if self.use_neg_next_state:
+            neg_next_state_npy = os.path.join(mext_state_dir, NEG_NEXT_STATE_NPY_TEMPLATE % self.max_next_state_len)
+            neg_next_state_mix_array: ndarray = np.load(neg_next_state_npy)
+            assert neg_next_state_mix_array.shape[0] == len(self.interaction_df)
+            self.interaction_df[NEG_NEXT_STATE_LEN] = neg_next_state_mix_array[:, 0].clip(min=1)
+            self.interaction_df[NEG_NEXT_STATE] = list(neg_next_state_mix_array[:, 1:])
 
     def _create_feature_column_dict(self) -> None:
         """生成数据列信息"""
         super()._create_feature_column_dict()
-        self.feature_column_dict[POS_HIS_LEN] = CategoricalColumnWithIdentity(category_num=0, feature_name=POS_HIS_LEN)
-        self.feature_column_dict[POS_HIS] = CategoricalColumnWithIdentity(category_num=0, feature_name=POS_HIS)
-        if self.use_neg_his:
-            self.feature_column_dict[NEG_HIS_LEN] = CategoricalColumnWithIdentity(
-                category_num=0, feature_name=NEG_HIS_LEN)
-            self.feature_column_dict[NEG_HIS] = CategoricalColumnWithIdentity(category_num=0, feature_name=NEG_HIS)
+        self.feature_column_dict[POS_NEXT_STATE_LEN] = CategoricalColumnWithIdentity(
+            category_num=0, feature_name=POS_NEXT_STATE_LEN)
+        self.feature_column_dict[POS_NEXT_STATE] = CategoricalColumnWithIdentity(
+            category_num=0, feature_name=POS_NEXT_STATE)
+        if self.use_neg_next_state:
+            self.feature_column_dict[NEG_NEXT_STATE_LEN] = CategoricalColumnWithIdentity(
+                category_num=0, feature_name=NEG_NEXT_STATE_LEN)
+            self.feature_column_dict[NEG_NEXT_STATE] = CategoricalColumnWithIdentity(
+                category_num=0, feature_name=NEG_NEXT_STATE)
 
 
 if __name__ == '__main__':
@@ -86,7 +90,7 @@ if __name__ == '__main__':
 
     init_console_logger()
     with Timer():
-        reader = HistoryDataReader(
+        reader = ValueRLDataReader(
             dataset='MovieLens-100K-PN',
             split_mode=SplitMode.LEAVE_K_OUT,
             warm_n=5,
