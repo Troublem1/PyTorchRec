@@ -10,7 +10,8 @@ import pandas as pd
 from pandas import DataFrame
 
 from torchrec.data.dataset import DatasetDescription
-from torchrec.data.process import generate_rl_next_item_sample
+from torchrec.data.process import generate_interaction_history_list, \
+    generate_interaction_next_state_list
 from torchrec.data.process.feature_process import get_int_map, get_bucketize_fn
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.utils.const import *
@@ -181,11 +182,13 @@ if __name__ == '__main__':
     # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
     # generate_interaction_history_list(dataset_name=dataset_name, k=10)
     # generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    generate_interaction_history_list(dataset_name=dataset_name, k=20)
+    generate_interaction_next_state_list(dataset_name=dataset_name, k=20)
     # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=8)
     # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=16)
-    generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
+    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
 
-    dataset_name = RAW_DATA_NAME + "-P"
+    # dataset_name = RAW_DATA_NAME + "-P"
     # format_data(
     #     dataset_name=dataset_name,
     #     rank_to_label={1: 1, 2: 1, 3: 1, 4: 1, 5: 1},
@@ -198,4 +201,4 @@ if __name__ == '__main__':
     # generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
     # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=8)
     # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=16)
-    generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
+    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)

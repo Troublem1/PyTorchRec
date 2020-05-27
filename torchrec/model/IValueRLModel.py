@@ -2,18 +2,19 @@
 模型接口类
 """
 import copy
-from abc import ABC
-from typing import Union, Optional, List, Type
+from abc import ABC, abstractmethod
+from typing import Union, Optional, List, Type, Dict
 
+from torch import Tensor
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss  # noqa
 from torch.utils.data import Dataset, DataLoader
-from tqdm import tqdm
 
 from torchrec.callback.CallbackList import CallbackList
 from torchrec.callback.History import History
 from torchrec.callback.ICallback import ICallback
 from torchrec.data.adapter import TrainDataset
+from torchrec.feature_column.CategoricalColumnWithIdentity import CategoricalColumnWithIdentity
 from torchrec.model import IModel
 from torchrec.task import TrainMode
 
@@ -24,28 +25,48 @@ from torchrec.task import TrainMode
 # todo 为了性能，临时删除batch回调，使用tqdm
 
 
+class IQNet(Module, ABC):
+    @abstractmethod
+    def forward(self, data: Dict[str, Tensor]) -> Tensor:
+        pass
+
+    @abstractmethod
+    def next_forward(self, data: Dict[str, Tensor]) -> Tensor:
+        pass
+
+    @abstractmethod
+    def load_pretrain_embedding(self) -> None:
+        pass
+
+
 class IValueRLModel(IModel, ABC):
     """模型接口类"""
 
     def __init__(self,
                  random_seed: int,
                  update_freq: int,
-                 q_net_type: Type[Module],
+                 gamma: float,
+                 reward_column: CategoricalColumnWithIdentity,
+                 q_net_type: Type[IQNet],
                  **kwargs,
                  ):
         self.update_freq = update_freq
-        self.eval_net: q_net_type(**kwargs)  # noqa
-        self.target_net: q_net_type(**kwargs)  # noqa
+        self.gamma = gamma
+        self.reward_column = reward_column
+        self.q_net_type = q_net_type
+        self.q_net_params = kwargs
         super().__init__(random_seed)
 
     def _init_weights(self):
-        pass
+        self.eval_net = self.q_net_type(**self.q_net_params)  # noqa
+        self.target_net = self.q_net_type(**self.q_net_params)  # noqa
 
     def _update_target_net(self):
         self.target_net.load_state_dict(copy.deepcopy(self.eval_net.state_dict()))
 
     def _reset_weights(self):
         self.eval_net.apply(self._reset_weights_fn)
+        self.eval_net.load_pretrain_embedding()
         self._update_target_net()
 
     def get_parameters(self):
@@ -110,9 +131,9 @@ class IValueRLModel(IModel, ABC):
         self.stop_training = False
         callbacks.on_train_begin()
         # batch = 0
-        logs = {}
-        for epoch in range(epochs):
-            callbacks.on_epoch_begin(epoch)
+        # logs = {}
+        epoch = 0
+        for epoch_index in range(epochs):
             if train_mode == TrainMode.PAIR_WISE:
                 dataset.train_neg_sample()
             data_loader = DataLoader(dataset=dataset,
@@ -120,27 +141,31 @@ class IValueRLModel(IModel, ABC):
                                      shuffle=shuffle,
                                      num_workers=workers,
                                      drop_last=drop_last)
-            for data in tqdm(data_loader, leave=False):
+            for data in data_loader:
+                callbacks.on_epoch_begin(epoch)
                 # callbacks.on_train_batch_begin(batch)
                 logs = self.train_step(data)
                 # callbacks.on_train_batch_end(batch, logs)
-            epoch_logs = copy.copy(logs)
+                epoch_logs = copy.copy(logs)
 
-            if (epoch + 1) % dev_freq == 0:
-                dev_logs = self.evaluate(
-                    dataset=dev_dataset,
-                    batch_size=dev_batch_size or batch_size,
-                    verbose=verbose,
-                    callbacks=callbacks,
-                    workers=workers
-                )
-                epoch_logs.update(dev_logs)
+                if (epoch + 1) % dev_freq == 0:
+                    dev_logs = self.evaluate(
+                        dataset=dev_dataset,
+                        batch_size=dev_batch_size or batch_size,
+                        verbose=verbose,
+                        callbacks=callbacks,
+                        workers=workers
+                    )
+                    epoch_logs.update(dev_logs)
 
-            # todo 目前按照epoch更新
-            if (epoch + 1) % self.update_freq == 0:
-                self._update_target_net()
+                # todo 目前按照epoch更新
+                if (epoch + 1) % self.update_freq == 0:
+                    self._update_target_net()
 
-            callbacks.on_epoch_end(epoch, epoch_logs)
+                callbacks.on_epoch_end(epoch, epoch_logs)
+                epoch += 1
+                if self.stop_training:
+                    break
             if self.stop_training:
                 break
 
