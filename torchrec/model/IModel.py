@@ -52,19 +52,23 @@ class IModel(Module, IWithArguments, ABC):
 
         self._init_weights()
 
-        def _setup_weights(m):
-            if 'Linear' in str(type(m)):
-                torch.nn.init.normal_(m.weight, mean=0.0, std=0.01)
-                if m.bias is not None:
-                    torch.nn.init.normal_(m.bias, mean=0.0, std=0.01)
-            elif 'Embedding' in str(type(m)):
-                torch.nn.init.normal_(m.weight, mean=0.0, std=0.01)
-
-        self.apply(_setup_weights)
+        self._reset_weights()
 
     @abstractmethod
     def _init_weights(self):
         pass
+
+    @staticmethod
+    def _reset_weights_fn(m):
+        if 'Linear' in str(type(m)):
+            torch.nn.init.normal_(m.weight, mean=0.0, std=0.01)
+            if m.bias is not None:
+                torch.nn.init.normal_(m.bias, mean=0.0, std=0.01)
+        elif 'Embedding' in str(type(m)):
+            torch.nn.init.normal_(m.weight, mean=0.0, std=0.01)
+
+    def _reset_weights(self):
+        self.apply(self._reset_weights_fn)
 
     def load_weights(self, filepath: str, device: torch.device):
         """加载权重"""

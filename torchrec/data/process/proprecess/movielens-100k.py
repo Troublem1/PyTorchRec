@@ -10,7 +10,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from torchrec.data.dataset import DatasetDescription
-from torchrec.data.process import generate_interaction_next_state_list
+from torchrec.data.process import generate_rl_next_item_sample
 from torchrec.data.process.feature_process import get_int_map, get_bucketize_fn
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.utils.const import *
@@ -180,7 +180,10 @@ if __name__ == '__main__':
     # generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
     # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
     # generate_interaction_history_list(dataset_name=dataset_name, k=10)
-    generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    # generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=8)
+    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=16)
+    generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
 
     dataset_name = RAW_DATA_NAME + "-P"
     # format_data(
@@ -192,4 +195,7 @@ if __name__ == '__main__':
     # generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
     # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
     # generate_interaction_history_list(dataset_name=dataset_name, k=10)
-    generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    # generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=8)
+    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=16)
+    generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)

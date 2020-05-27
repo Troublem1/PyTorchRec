@@ -1,6 +1,8 @@
+from typing import Dict, Any, List
+
+import torch
 from torch import Tensor
 from torch.nn import Embedding
-from typing import Dict, Any, List
 
 from torchrec.feature_column.CategoricalColumnWithIdentity import CategoricalColumnWithIdentity
 from torchrec.model import IModel
@@ -47,6 +49,10 @@ class FunkSVD(IModel):
 
         if len(i_ids.shape) == 1:
             prediction: Tensor = (u_vectors * i_vectors).sum(dim=-1)  # [batch_size]
+
+            target = self.label_column.get_feature_data(data)
+            if target is not None:
+                target = target.float()
         else:
             sample_n: int = i_ids.shape[1]
             # [batch_size * sample_n, emb_size]
@@ -55,8 +61,7 @@ class FunkSVD(IModel):
             i_vectors: Tensor = i_vectors.reshape(-1, self.emb_size)
             prediction: Tensor = (u_vectors * i_vectors).sum(dim=-1).reshape(-1, sample_n)  # [batch_size, sample_n]
 
-        target = self.label_column.get_feature_data(data)
-        if target is not None:
-            target = target.float()
+            target = torch.zeros_like(prediction, dtype=torch.float32)
+            target[:, 0] = 1
 
         return prediction, target

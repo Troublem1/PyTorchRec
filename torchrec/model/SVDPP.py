@@ -64,6 +64,11 @@ class SVDPP(IModel):
             # [batch_size]
             prediction: Tensor = (((u_vectors + implicit_i_vector) * i_vectors).sum(dim=-1)
                                   + u_bias + i_bias + self.global_bias)
+
+            target = self.label_column.get_feature_data(data)
+            if target is not None:
+                target = target.float()
+
         else:
             sample_n: int = i_ids.shape[1]
             # [batch_size * sample_n, emb_size]
@@ -80,8 +85,7 @@ class SVDPP(IModel):
             prediction: Tensor = (((u_vectors + implicit_i_vector) * i_vectors).sum(dim=-1)
                                   + u_bias + i_bias + self.global_bias).reshape(-1, sample_n)
 
-        target = self.label_column.get_feature_data(data)
-        if target is not None:
-            target = target.float()
+            target = torch.zeros_like(prediction, dtype=torch.float32)
+            target[:, 0] = 1
 
         return prediction, target

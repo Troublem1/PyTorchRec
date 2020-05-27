@@ -65,6 +65,11 @@ POS_NEXT_STATE_NPY_TEMPLATE = 'pos_next_state_%d.npy'  # 正向交互历史信�
 NEG_NEXT_STATE_CSV_TEMPLATE = 'neg_next_state_%d.csv'  # 负向交互历史信息
 NEG_NEXT_STATE_NPY_TEMPLATE = 'neg_next_state_%d.npy'  # 负向交互历史信息
 
+RL_SAMPLE_DIR = 'RL_SAMPLE'
+
+RL_SAMPLE_CSV_TEMPLATE = 'rl_sample_%d.csv'  # Value-based RL 采样信息（训练集）
+RL_SAMPLE_NPY_TEMPLATE = 'rl_sample_%d.npy'  # Value-based RL 采样信息（训练集）
+
 # 数据格式相关常量
 SEP = '\t'
 SEQ_SEP = ","
@@ -85,6 +90,7 @@ POS_NEXT_STATE_LEN = "pos_next_state_len"
 POS_NEXT_STATE = "pos_next_state"
 NEG_NEXT_STATE_LEN = "neg_next_state_len"
 NEG_NEXT_STATE = "neg_next_state"
+RL_SAMPLE = 'rl_sample'  # Value-based RL模型候选集
 
 # 数据集描述词典常量
 # 0.数据集描述
