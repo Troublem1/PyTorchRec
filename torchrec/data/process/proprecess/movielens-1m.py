@@ -3,14 +3,15 @@ MovieLens-1M数据集预处理
 """
 import logging
 import pickle as pkl
-from typing import Dict
 
 import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
+from typing import Dict
 
 from torchrec.data.dataset import DatasetDescription
-from torchrec.data.process import generate_interaction_history_list
+from torchrec.data.process import generate_interaction_history_list, generate_interaction_next_state_list, \
+    generate_rl_next_item_sample
 from torchrec.data.process import generate_leave_k_out_split
 from torchrec.data.process import generate_sequential_split
 from torchrec.data.process import generate_vt_negative_sample
@@ -202,16 +203,19 @@ if __name__ == '__main__':
     )
     generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
     generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
-    generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
+    for i in range(5):
+        generate_vt_negative_sample(seed=SEED + i, dataset_name=dataset_name, sample_n=99)
     generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
 
-    dataset_name = RAW_DATA_NAME + "-P"
-    format_data(
-        dataset_name=dataset_name,
-        rank_to_label={1: 1, 2: 1, 3: 1, 4: 1, 5: 1},
-        info="全部视为正例的MovieLens-1M数据集，评分为1/2/3/4/5为正例"
-    )
-    generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
-    generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
-    generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
-    generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    # dataset_name = RAW_DATA_NAME + "-P"
+    # format_data(
+    #     dataset_name=dataset_name,
+    #     rank_to_label={1: 1, 2: 1, 3: 1, 4: 1, 5: 1},
+    #     info="全部视为正例的MovieLens-1M数据集，评分为1/2/3/4/5为正例"
+    # )
+    # generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
+    # generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
+    # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
+    # generate_interaction_history_list(dataset_name=dataset_name, k=10)

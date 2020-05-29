@@ -1,8 +1,7 @@
-from typing import Dict, Any, List
-
 import torch
 from torch import Tensor
-from torch.nn import Module, Embedding, GRU, Linear
+from torch.nn import Embedding, GRU, Linear
+from typing import Dict, Any, List
 
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.model.IValueRLModel import IValueRLModel, IQNet
@@ -49,7 +48,7 @@ class DQNQNet(IQNet):
         state_packed = torch.nn.utils.rnn.pack_padded_sequence(
             sort_state_vectors, sort_state_lengths, batch_first=True)
 
-        output, hidden = self.rnn(state_packed, None)
+        output, hidden = self.rnn(state_packed, None)  # noqa
 
         # Unsort
         sort_rnn_vector = self.out(hidden[-1])  # B * E
@@ -88,8 +87,9 @@ class DQNQNet(IQNet):
         return prediction
 
     def load_pretrain_embedding(self) -> None:
-        weight = torch.load(self.weight_file)["i_embeddings.weight"]
-        self.i_embedding.from_pretrained(embeddings=weight, freeze=True)
+        # weight = torch.load(self.weight_file)["i_embeddings.weight"]
+        # self.i_embedding.from_pretrained(embeddings=weight, freeze=True)
+        pass
 
 
 class DQN(IValueRLModel):

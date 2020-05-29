@@ -5,8 +5,7 @@ from torchrec.data.ValueRLDataReader import ValueRLDataReader
 from torchrec.data.dataset.SplitMode import SplitMode
 from torchrec.metric.Hit import Hit
 from torchrec.metric.NDCG import NDCG
-from torchrec.model.DEERS import DEERSQNet
-from torchrec.model.DQN import DQN
+from torchrec.model.DEERS import DEERSQNet, DEERS
 from torchrec.task.GridSearch import GridSearch
 from torchrec.task.GridSearch import create_params_list
 from torchrec.task.TrainMode import TrainMode
@@ -90,7 +89,7 @@ if __name__ == '__main__':
         train_mode=TrainMode.POINT_WISE,
         data_reader_type=ValueRLDataReader,
         data_reader_params=data_reader_params,
-        model_type=DQN,
+        model_type=DEERS,
         model_params_list=model_params_list,
         epoch=100,
         batch_size=256,

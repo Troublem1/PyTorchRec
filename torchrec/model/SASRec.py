@@ -1,10 +1,9 @@
-from typing import Dict, Any, List
-
 import numpy as np
 import torch
 from torch import Tensor
 from torch.nn import Embedding
 from torch.nn.modules.loss import _Loss  # noqa
+from typing import Dict, Any, List
 
 from torchrec.feature_column.CategoricalColumnWithIdentity import CategoricalColumnWithIdentity
 from torchrec.model import IModel
@@ -26,7 +25,7 @@ def scaled_dot_product_attention(q, k, v, scale=None, attn_mask=None):
         attention = attention * scale
     attention = attention - attention.max()
     if attn_mask is not None:
-        attention = attention.masked_fill(attn_mask, -np.inf)
+        attention = attention.masked_fill(attn_mask.bool(), -np.inf)
     attention = attention.softmax(dim=-1)
     context = torch.bmm(attention, v)  # [-1, L_q, V]
     return context

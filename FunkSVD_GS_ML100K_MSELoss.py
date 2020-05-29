@@ -1,4 +1,4 @@
-from torch.nn import BCEWithLogitsLoss
+from torch.nn import MSELoss
 from torch.optim import Adam
 
 from torchrec.data.SimpleDataReader import SimpleDataReader
@@ -21,7 +21,7 @@ if __name__ == '__main__':
         "neg_sample_n": 99,
         "load_feature": False,
         "append_id": False,
-        "train_mode": TrainMode.PAIR_WISE,
+        "train_mode": TrainMode.POINT_WISE,
         "random_seed": 2020,
     }
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         }
     )
 
-    loss = BCEWithLogitsLoss()
+    loss = MSELoss()
 
     metrics = (
             [NDCG(user_sample_n=100, k=k) for k in [1, 2, 5, 10, 20, 50, 100]]
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         gpu=0,
         random_seed=2020,
         metrics=metrics,
-        train_mode=TrainMode.PAIR_WISE,
+        train_mode=TrainMode.POINT_WISE,
         data_reader_type=SimpleDataReader,
         data_reader_params=data_reader_params,
         model_type=FunkSVD,

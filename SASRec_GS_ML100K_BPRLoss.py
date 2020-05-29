@@ -1,11 +1,11 @@
-from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
 
-from torchrec.data.SimpleDataReader import SimpleDataReader
+from torchrec.data.HistoryDataReader import HistoryDataReader
 from torchrec.data.dataset.SplitMode import SplitMode
+from torchrec.loss.BPRLoss import BPRLoss
 from torchrec.metric.Hit import Hit
 from torchrec.metric.NDCG import NDCG
-from torchrec.model.FunkSVD import FunkSVD
+from torchrec.model.SASRec import SASRec
 from torchrec.task.GridSearch import GridSearch
 from torchrec.task.GridSearch import create_params_list
 from torchrec.task.TrainMode import TrainMode
@@ -23,21 +23,29 @@ if __name__ == '__main__':
         "append_id": False,
         "train_mode": TrainMode.PAIR_WISE,
         "random_seed": 2020,
+        "max_his_len": 10,
+        "use_neg_his": False,
     }
 
-    feature_column_dict = SimpleDataReader(**data_reader_params).get_feature_column_dict()
+    feature_column_dict = HistoryDataReader(**data_reader_params).get_feature_column_dict()
 
-    uid_column = feature_column_dict.get(UID)
     iid_column = feature_column_dict.get(IID)
+    his_len_column = feature_column_dict.get(POS_HIS_LEN)
+    his_column = feature_column_dict.get(POS_HIS)
     label_column = feature_column_dict.get(LABEL)
 
     model_params_list = create_params_list(
         base_params={
             "random_seed": 2020,
-            "uid_column": uid_column,
             "iid_column": iid_column,
+            "his_len_column": his_len_column,
+            "his_column": his_column,
             "label_column": label_column,
             "emb_size": 64,
+            "hidden_size": 256,
+            "max_his_len": 10,
+            "num_layers": 1,
+            "dropout": 0.2,
         },
         search_params={},
     )
@@ -50,7 +58,7 @@ if __name__ == '__main__':
         }
     )
 
-    loss = BCEWithLogitsLoss()
+    loss = BPRLoss()
 
     metrics = (
             [NDCG(user_sample_n=100, k=k) for k in [1, 2, 5, 10, 20, 50, 100]]
@@ -62,9 +70,9 @@ if __name__ == '__main__':
         random_seed=2020,
         metrics=metrics,
         train_mode=TrainMode.PAIR_WISE,
-        data_reader_type=SimpleDataReader,
+        data_reader_type=HistoryDataReader,
         data_reader_params=data_reader_params,
-        model_type=FunkSVD,
+        model_type=SASRec,
         model_params_list=model_params_list,
         epoch=100,
         batch_size=256,

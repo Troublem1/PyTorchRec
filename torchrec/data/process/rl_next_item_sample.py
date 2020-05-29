@@ -1,11 +1,11 @@
 import logging
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame
 from tqdm import tqdm
+from typing import Dict, List
 
 from torchrec.data.process.interaction_history_list import pad_or_cut_array
 from torchrec.utils.const import *
@@ -49,6 +49,7 @@ def generate_rl_next_item_sample(dataset_name: str, sample_len: int) -> None:
             if label == 1:
                 his_list_pos += 1
             sample_list = pos_his_list[max(0, his_list_pos - l_size):min(his_list_pos + r_size, pos_his_list_len)]
+            # sample_list = pos_his_list[max(0, his_list_pos - sample_len):his_list_pos]
             rl_sample_list.append(pad_or_cut_array(sample_list, sample_len, pad=sample_list[-1]))
     rl_sample_array = np.vstack(rl_sample_list)
     assert rl_sample_array.dtype == np.int32, rl_sample_array.dtype

@@ -19,6 +19,7 @@ DATASET_DIR = os.path.join(WORK_DIR, 'Dataset')  # 过滤并格式化数据目�
 LOG_DIR = os.path.join(WORK_DIR, 'Log')
 MODEL_DIR = os.path.join(WORK_DIR, 'Model')
 GRID_SEARCH_DIR = os.path.join(WORK_DIR, 'GridSearch')
+REPEAT_TASK_DIR = os.path.join(WORK_DIR, 'RepeatTask')
 
 BASE_INTERACTION_CSV = 'base_interaction.csv'  # 用户ID、物品ID、评分、标签、时间戳信息
 BASE_INTERACTION_FEATHER = 'base_interaction.feather'  # 用户ID、物品ID、评分、标签、时间戳信息
@@ -46,10 +47,10 @@ TEST_INDEX_NPY_TEMPLATE = "%s.test_index.npy"  # 测试集对应的interaction_d
 NEGATIVE_SAMPLE_DIR = "NEGATIVE_SAMPLE"
 
 USER_POS_HIS_SET_DICT_PKL = 'user_pos_his_set_dict.pkl'  # 正向交互信息构成集合按 uid 合并文件
-DEV_NEG_CSV_TEMPLATE = 'dev_neg_%d.csv'  # 验证集负采样文件
-DEV_NEG_NPY_TEMPLATE = 'dev_neg_%d.npy'  # 验证集负采样文件
-TEST_NEG_CSV_TEMPLATE = 'test_neg_%d.csv'  # 测试集负采样文件
-TEST_NEG_NPY_TEMPLATE = 'test_neg_%d.npy'  # 测试集负采样文件
+DEV_NEG_CSV_TEMPLATE = 'dev_neg_%d_%d.csv'  # 验证集负采样文件
+DEV_NEG_NPY_TEMPLATE = 'dev_neg_%d_%d.npy'  # 验证集负采样文件
+TEST_NEG_CSV_TEMPLATE = 'test_neg_%d_%d.csv'  # 测试集负采样文件
+TEST_NEG_NPY_TEMPLATE = 'test_neg_%d_%d.npy'  # 测试集负采样文件
 
 HISTORY_DIR = 'HISTORY'
 

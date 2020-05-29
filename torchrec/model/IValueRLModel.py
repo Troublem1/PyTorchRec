@@ -3,18 +3,21 @@
 """
 import copy
 from abc import ABC, abstractmethod
-from typing import Union, Optional, List, Type, Dict
 
+import torch
 from torch import Tensor
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss  # noqa
+from torch.optim.optimizer import Optimizer
 from torch.utils.data import Dataset, DataLoader
+from typing import Union, Optional, List, Type, Dict
 
 from torchrec.callback.CallbackList import CallbackList
 from torchrec.callback.History import History
 from torchrec.callback.ICallback import ICallback
 from torchrec.data.adapter import TrainDataset
 from torchrec.feature_column.CategoricalColumnWithIdentity import CategoricalColumnWithIdentity
+from torchrec.metric import IMetric
 from torchrec.model import IModel
 from torchrec.task import TrainMode
 
@@ -26,6 +29,10 @@ from torchrec.task import TrainMode
 
 
 class IQNet(Module, ABC):
+    def __init__(self):
+        super().__init__()
+        self.compile_device: Optional[torch.device] = None
+
     @abstractmethod
     def forward(self, data: Dict[str, Tensor]) -> Tensor:
         pass
@@ -79,6 +86,11 @@ class IValueRLModel(IModel, ABC):
                 weight_p.append(p)
         optimize_dict = [{'params': weight_p}, {'params': bias_p, 'weight_decay': 0.0}]
         return optimize_dict
+
+    def compile(self, optimizer: Optimizer, loss: _Loss, metrics: List[IMetric], device: torch.device):
+        super().compile(optimizer, loss, metrics, device)
+        self.eval_net.compile_device = device
+        self.target_net.compile_device = device
 
     def fit(self,
             dataset: TrainDataset,

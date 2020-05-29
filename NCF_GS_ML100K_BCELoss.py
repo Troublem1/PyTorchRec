@@ -73,7 +73,7 @@ if __name__ == '__main__':
         optimizer_type=Adam,
         optimizer_params_list=optimizer_params_list,
         loss=loss,
-        num_workers=0,
+        num_workers=1,
         dev_freq=1,
         monitor="ndcg@10",
         monitor_mode="max",

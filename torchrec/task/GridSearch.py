@@ -1,12 +1,12 @@
 import copy
 import itertools
-from typing import Dict, Any, List, Tuple, Type
 
 import pandas as pd
 from numpy.random._generator import default_rng  # noqa
 from pandas import DataFrame
 from torch.nn.modules.loss import _Loss  # noqa
 from torch.optim.optimizer import Optimizer
+from typing import Dict, Any, List, Tuple, Type
 
 from torchrec.data.IDataReader import IDataReader
 from torchrec.metric import IMetric
@@ -73,7 +73,9 @@ class GridSearch(ITask):
 
         self.log_filename = os.path.join(
             GRID_SEARCH_DIR,
-            f"{self.model_type.__name__}_{self.data_reader_params['dataset']}_grid_search.csv")
+            f"{self.model_type.__name__}"
+            f"_{self.data_reader_params['dataset']}"
+            f"_{self.loss.__class__.__name__}_grid_search.csv")
 
     def run(self):
         task_logs: Dict[str, List] = {}
@@ -122,11 +124,11 @@ class GridSearch(ITask):
                 params.update({f"test_{key}": test_logs[key] for key in test_logs})
                 for key in params:
                     task_logs.setdefault(key, []).append(params[key])
-        grid_search_df: DataFrame = pd.DataFrame(task_logs)
-        grid_search_df.to_csv(
-            path_or_buf=self.log_filename,
-            sep="\t",
-        )
+                grid_search_df: DataFrame = pd.DataFrame(task_logs)
+                grid_search_df.to_csv(
+                    path_or_buf=self.log_filename,
+                    sep="\t",
+                )
 
     @classmethod
     def create_from_console(cls):

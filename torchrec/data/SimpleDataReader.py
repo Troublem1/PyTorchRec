@@ -5,7 +5,6 @@ ID数据加载器，加载数据集ID信息
 import gc
 import logging
 import pickle as pkl
-from typing import List, Dict, Any, Optional, Set
 
 import numpy as np
 import pandas as pd
@@ -13,6 +12,7 @@ from numpy import ndarray
 from numpy.random import default_rng  # noqa
 from pandas import DataFrame
 from tqdm import tqdm
+from typing import List, Dict, Any, Optional, Set
 
 from torchrec.data.IDataReader import IDataReader
 from torchrec.data.dataset import SplitMode
@@ -118,6 +118,7 @@ class SimpleDataReader(IDataReader):
         self.append_id = append_id
         self.train_mode = train_mode
         self.rng = default_rng(random_seed)
+        self.random_seed = random_seed
 
         self.interaction_df: Optional[DataFrame] = None
         self.item_df: Optional[DataFrame] = None
@@ -235,7 +236,8 @@ class SimpleDataReader(IDataReader):
         user_index_array: ndarray = self.dev_df[UID].values - 1
 
         logging.debug('加载验证集负采样信息...')
-        dev_neg_npy = os.path.join(neg_sample_dir, DEV_NEG_NPY_TEMPLATE % self.neg_sample_n)
+        dev_neg_npy = os.path.join(neg_sample_dir, DEV_NEG_NPY_TEMPLATE % (self.random_seed, self.neg_sample_n))
+        print(np.load(dev_neg_npy).shape)
         dev_neg_array: ndarray = np.load(dev_neg_npy)[user_index_array]
         dev_pos_array: ndarray = self.dev_df[IID].values.reshape(-1, 1)
         self.dev_iid_topk_array: ndarray = np.hstack((dev_pos_array, dev_neg_array))
@@ -243,7 +245,7 @@ class SimpleDataReader(IDataReader):
         logging.debug(self.dev_iid_topk_array.shape)
 
         logging.debug('加载测试集负采样信息...')
-        test_neg_npy = os.path.join(neg_sample_dir, TEST_NEG_NPY_TEMPLATE % self.neg_sample_n)
+        test_neg_npy = os.path.join(neg_sample_dir, TEST_NEG_NPY_TEMPLATE % (self.random_seed, self.neg_sample_n))
         test_neg_array: ndarray = np.load(test_neg_npy)[user_index_array]
         test_pos_array: ndarray = self.test_df[IID].values.reshape(-1, 1)
         self.test_iid_topk_array: ndarray = np.hstack((test_pos_array, test_neg_array))

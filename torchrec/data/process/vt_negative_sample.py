@@ -3,7 +3,6 @@
 """
 import logging
 import pickle as pkl
-from typing import List, Set, Dict
 
 import numpy as np
 import pandas as pd
@@ -11,6 +10,7 @@ from numpy import ndarray
 from numpy.random import default_rng
 from pandas import DataFrame
 from tqdm import tqdm
+from typing import List, Set, Dict
 
 from torchrec.utils.const import *
 from torchrec.utils.system import check_dir_and_mkdir
@@ -109,15 +109,16 @@ def generate_vt_negative_sample(seed: int, dataset_name: str, sample_n: int) -> 
     logging.info('输出负采样结果...')
 
     assert validation_neg_sample_iid_array.dtype == np.int32, validation_neg_sample_iid_array.dtype
-    np.save(os.path.join(neg_sample_dir, DEV_NEG_NPY_TEMPLATE % sample_n), validation_neg_sample_iid_array)
+    print(validation_neg_sample_iid_array.shape)
+    np.save(os.path.join(neg_sample_dir, DEV_NEG_NPY_TEMPLATE % (seed, sample_n)), validation_neg_sample_iid_array)
     # noinspection PyTypeChecker
-    np.savetxt(os.path.join(neg_sample_dir, DEV_NEG_CSV_TEMPLATE % sample_n), validation_neg_sample_iid_array,
+    np.savetxt(os.path.join(neg_sample_dir, DEV_NEG_CSV_TEMPLATE % (seed, sample_n)), validation_neg_sample_iid_array,
                delimiter=SEP, fmt='%d')
 
     assert test_neg_sample_iid_array.dtype == np.int32, test_neg_sample_iid_array.dtype
-    np.save(os.path.join(neg_sample_dir, TEST_NEG_NPY_TEMPLATE % sample_n), test_neg_sample_iid_array)
+    np.save(os.path.join(neg_sample_dir, TEST_NEG_NPY_TEMPLATE % (seed, sample_n)), test_neg_sample_iid_array)
     # noinspection PyTypeChecker
-    np.savetxt(os.path.join(neg_sample_dir, TEST_NEG_CSV_TEMPLATE % sample_n), test_neg_sample_iid_array,
+    np.savetxt(os.path.join(neg_sample_dir, TEST_NEG_CSV_TEMPLATE % (seed, sample_n)), test_neg_sample_iid_array,
                delimiter=SEP, fmt='%d')
 
 

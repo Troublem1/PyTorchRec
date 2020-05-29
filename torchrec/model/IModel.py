@@ -4,7 +4,6 @@
 import copy
 import pickle
 from abc import ABC, abstractmethod
-from typing import Union, Optional, List, Dict
 
 import numpy as np
 import torch
@@ -14,6 +13,7 @@ from torch.nn.modules.loss import _Loss  # noqa
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+from typing import Union, Optional, List, Dict
 
 from torchrec.callback.CallbackList import CallbackList
 from torchrec.callback.History import History
@@ -253,6 +253,8 @@ class IModel(Module, IWithArguments, ABC):
 
         predictions: ndarray = np.concatenate(predictions)
         targets: ndarray = np.concatenate(targets)
+
+        # print(predictions)
 
         logs = self.compiled_metrics(predictions, targets)
 

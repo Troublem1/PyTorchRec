@@ -3,15 +3,16 @@ MovieLens-100K数据预处理
 """
 import logging
 import pickle as pkl
-from typing import Dict
 
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
+from typing import Dict
 
 from torchrec.data.dataset import DatasetDescription
 from torchrec.data.process import generate_interaction_history_list, \
-    generate_interaction_next_state_list
+    generate_interaction_next_state_list, generate_sequential_split, generate_leave_k_out_split, \
+    generate_vt_negative_sample, generate_rl_next_item_sample
 from torchrec.data.process.feature_process import get_int_map, get_bucketize_fn
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.utils.const import *
@@ -172,21 +173,18 @@ if __name__ == '__main__':
     init_console_logger(logging.DEBUG)
 
     dataset_name = RAW_DATA_NAME + "-PN"
-    # format_data(
-    #     dataset_name=dataset_name,
-    #     rank_to_label={1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
-    #     info="正负例化的MovieLens-100K数据集，评分为4/5为正例，评分为1/2/3为负例"
-    # )
-    # generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
-    # generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
-    # generate_vt_negative_sample(seed=SEED, dataset_name=dataset_name, sample_n=99)
-    # generate_interaction_history_list(dataset_name=dataset_name, k=10)
-    # generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
-    generate_interaction_history_list(dataset_name=dataset_name, k=20)
-    generate_interaction_next_state_list(dataset_name=dataset_name, k=20)
-    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=8)
-    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=16)
-    # generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
+    format_data(
+        dataset_name=dataset_name,
+        rank_to_label={1: 0, 2: 0, 3: 0, 4: 1, 5: 1},
+        info="正负例化的MovieLens-100K数据集，评分为4/5为正例，评分为1/2/3为负例"
+    )
+    generate_sequential_split(dataset_name=dataset_name, warm_n=5, vt_ratio=0.1)
+    generate_leave_k_out_split(dataset_name=dataset_name, warm_n=5, k=1)
+    for i in range(5):
+        generate_vt_negative_sample(seed=SEED + i, dataset_name=dataset_name, sample_n=99)
+    generate_interaction_history_list(dataset_name=dataset_name, k=10)
+    generate_interaction_next_state_list(dataset_name=dataset_name, k=10)
+    generate_rl_next_item_sample(dataset_name=dataset_name, sample_len=32)
 
     # dataset_name = RAW_DATA_NAME + "-P"
     # format_data(
