@@ -5,11 +5,15 @@ from typing import Dict
 
 from torchrec.feature_column import CategoricalColumnWithIdentity
 from torchrec.model.IValueRLModel import IQNet
+from torchrec.model.LSRL import LSRL
 from torchrec.model.layer.Dense import Dense
 from torchrec.model.layer.MLP import MLP
 
 
-class LSRLQNet(IQNet):
+# V0版本：(p-GRU + n-GRU + MLP) + MLP + Linear
+
+
+class LSRLLPSQNet(IQNet):
     def __init__(self,
                  weight_file: str,
                  uid_column: CategoricalColumnWithIdentity,
@@ -25,12 +29,10 @@ class LSRLQNet(IQNet):
                  rl_sample_column: CategoricalColumnWithIdentity,
                  emb_size: int,
                  hidden_size: int,
-                 max_state_len: int,
                  ):
         super().__init__()
         self.emb_size = emb_size
         self.hidden_size = hidden_size
-        self.max_state_len = max_state_len
         self.uid_column = uid_column
         self.iid_column = iid_column
         self.pos_state_len_column = pos_state_len_column
@@ -135,6 +137,11 @@ class LSRLQNet(IQNet):
         return prediction
 
     def load_pretrain_embedding(self) -> None:
-        weight = torch.load(self.weight_file)
-        self.i_embeddings.from_pretrained(embeddings=weight["i_embeddings.weight"], freeze=True)
-        self.u_embeddings.from_pretrained(embeddings=weight["u_embeddings.weight"], freeze=True)
+        # weight = torch.load(self.weight_file)
+        # self.i_embeddings.from_pretrained(embeddings=weight["i_embeddings.weight"], freeze=True)
+        # self.u_embeddings.from_pretrained(embeddings=weight["u_embeddings.weight"], freeze=True)
+        pass
+
+
+class LSRLLPS(LSRL):
+    pass
